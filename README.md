@@ -1,6 +1,6 @@
 # Wasmer-JS Move-compile Demo
 
-This repository consists a demo for compile move module in web use wasmer-js.
+Compile the move example module in-browser using wasmer-js
 
 
 ## Prerequisites

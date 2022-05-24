@@ -1,22 +1,63 @@
 {
-  "name": "wasmer-js-hello-world",
-  "version": "1.0.0",
+  "name": "wasmer-js",
+  "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yubing744/move-js"
+  },
+  "source": "pkg/index.ts",
+  "module": "dist/module.js",
+  "main": "dist/main.js",
+  "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "build": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/wasmer-js-move-compile-demo.wasm ./static",
-    "dev": "parcel index.html",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "watch": "parcel watch",
+    "build": "npm run build-rc; rollup -c --environment BUILD:production",
+    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move.wasm ./pkg",
+    "test": "karma start karma.conf.ts",
+    "lint": "run-s lint:ts:tslint lint:ts:preetier",
+    "lint:js": "prettier --write pkg/**/*.js",
+    "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
+    "lint:ts:preetier": "prettier --write pkg/**/*.ts"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "parcel-bundler": "^1.12.5",
-    "parcel-plugin-static-files-copy": "^2.6.0"
+    "@parcel/transformer-typescript-types": "2.5.0",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-node-resolve": "^13.3.0",
+    "@rollup/plugin-url": "^7.0.0",
+    "@rollup/plugin-wasm": "^5.2.0",
+    "@types/jest": "^24.0.16",
+    "jasmine-core": "^4.1.1",
+    "jest": "^28.1.0",
+    "karma": "^4.4.1",
+		"karma-chrome-launcher": "^3.1.0",
+		"karma-jasmine": "^3.1.1",
+		"karma-mocha-reporter": "^2.2.3",
+    "karma-rollup-preprocessor": "^7.0.8",
+    "mocha": "^10.0.0",
+    "npm-run-all": "^4.1.5",
+    "parcel": "^2.4.1",
+    "prettier": "1.18.2",
+    "pretty-quick": "^1.11.1",
+    "rollup": "^1.29.0",
+		"rollup-plugin-babel": "^4.3.3",
+		"rollup-plugin-buble": "^0.19.8",
+		"rollup-plugin-commonjs": "^10.1.0",
+		"rollup-plugin-node-resolve": "^5.2.0",
+    "ts-jest": "^28.0.2",
+    "tslint": "^5.20.0",
+    "tslint-config-prettier": "^1.18.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": ">=3.0.0",
+    "url": "^0.11.0"
   },
   "dependencies": {
+    "@swc/helpers": "^0.3.13",
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasm-transformer": "^0.10.0",
-    "@wasmer/wasmfs": "^0.12.0"
+    "@wasmer/wasmfs": "^0.12.0",
+    "node-fetch": "^3.2.4"
   }
 }

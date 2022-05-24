@@ -1,5 +1,5 @@
 [package]
-name = "wasmer-js-move-compile-demo"
+name = "move"
 version = "0.1.0"
 edition = "2021"
 

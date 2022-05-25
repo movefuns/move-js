@@ -9,17 +9,17 @@
 //     ],
 // };
 
-import resolve from '@rollup/plugin-node-resolve';
-// import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import babel from 'rollup-plugin-babel';
 import { terser } from 'rollup-plugin-terser';
 import pkg from './package.json';
-import typescript from 'rollup-plugin-typescript2';
-import { wasm } from '@rollup/plugin-wasm';
+//import typescript from 'rollup-plugin-typescript2';
+//import { wasm } from '@rollup/plugin-wasm';
 // import smartAsset from "rollup-plugin-smart-asset"
-import url from '@rollup/plugin-url';
+//import url from '@rollup/plugin-url';
 
-const LIBRARY_NAME = 'Library'; // Change with your library's name
+const LIBRARY_NAME = 'move-js'; // Change with your library's name
 const EXTERNAL = []; // Indicate which modules should be treated as external
 const GLOBALS = {}; // https://rollupjs.org/guide/en/#outputglobals
 
@@ -66,6 +66,13 @@ const makeConfig = (env = 'development') => {
                 format: 'es',
                 exports: 'named',
                 globals: GLOBALS
+            },
+            {
+                banner,
+                file: `dist/${LIBRARY_NAME}.iife.${bundleSuffix}js`, // iife
+                format: 'iife',
+                exports: 'auto',
+                globals: GLOBALS
             }
         ],
         plugins: [
@@ -76,16 +83,22 @@ const makeConfig = (env = 'development') => {
             //     url: 'inline',
             //     extensions: ['.wasm'],
             // }),
-            url({
-                include: ['**/*.wasm'],
-                limit: 14336000,
-                // limit: 0,
-            }),
+            //url({
+            //    include: ['**/*.wasm'],
+            //    limit: 14336000,
+            //    // limit: 0,
+            //}),
             // Uncomment the following 2 lines if your library has external dependencies
-            resolve(), // teach Rollup how to find external modules
-            typescript({
-                rollupCommonJSResolveHack: false,
-                clean: true,          
+            resolve({
+                extensions: ['.js', '.ts']
+            }), // teach Rollup how to find external modules
+            commonjs({
+                    include: 'node_modules/**',
+                    extensions: ['.js', '.ts'],
+            }),
+            babel({
+                exclude: 'node_modules/**',
+                extensions: ['.js', '.ts'],        
             })
         ]
     };

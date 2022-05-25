@@ -1,5 +1,5 @@
-import { WasmFs } from '@wasmer/wasmfs'
-import { Git } from "../pkg/git";
+// import { WasmFs } from '@wasmer/wasmfs'
+// import { Git } from "../pkg/git";
 
 
 describe("Git", () => {
@@ -34,8 +34,11 @@ describe("Git", () => {
     expect(stat2.isDirectory()).toBeTruthy();
   });
 
+  /*
   it("download github repo should be ok", async () => {
-    let ret = await git.download("https://github.com/yubing744/guide-to-move-package-manager/archive/refs/heads/main.zip", "/tmp/guide-to-move-package-manager");
+    let ret = await git.download("./data/my-counter.zip", "/tmp/guide-to-move-package-manager");
     expect(ret).toBeDefined()
   });
+  */
+
 });

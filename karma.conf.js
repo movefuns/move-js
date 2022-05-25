@@ -25,47 +25,28 @@ module.exports = function(config) {
 		exclude: [],
 
 		preprocessors: {
-			'test/**/*.test.ts': ['rollupNodeTypescript'],
+			'test/**/*.test.ts': ['rollup'],
 		},
 
 		rollupPreprocessor: {
 			output: {
-				name: 'lib',
+				name: 'move-js',
 				format: 'iife',
 				sourcemap: 'inline',
 			},
-			plugins: [require('rollup-plugin-buble')()],
-		},
-
-		customPreprocessors: {
-			rollupNode: {
-				base: 'rollup',
-				options: {
-					plugins: [
-						require('rollup-plugin-node-resolve')(),
-						require('rollup-plugin-commonjs')(),
-						require('rollup-plugin-buble')(),
-					],
-				},
-			},
-			rollupNodeTypescript: {
-				base: 'rollup',
-				options: {
-					plugins: [
-						require('rollup-plugin-node-resolve')({
-							extensions: ['.js', '.ts'],
-						}),
-						require('rollup-plugin-commonjs')({
-							include: 'node_modules/**',
-							extensions: ['.js', '.ts'],
-						}),
-						require('rollup-plugin-babel')({
-							exclude: 'node_modules/**',
-							extensions: ['.js', '.ts'],
-						}),
-					],
-				},
-			},
-		},
+			plugins: [
+				require('rollup-plugin-node-resolve')({
+					extensions: ['.js', '.ts'],
+				}),
+				require('rollup-plugin-commonjs')({
+					include: 'node_modules/**',
+					extensions: ['.js', '.ts'],
+				}),
+				require('rollup-plugin-babel')({
+					exclude: 'node_modules/**',
+					extensions: ['.js', '.ts'],
+				}),
+			],
+		}
 	})
 }

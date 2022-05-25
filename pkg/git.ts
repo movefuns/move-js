@@ -1,5 +1,5 @@
 import { WasmFs } from '@wasmer/wasmfs'
-import  axios  from 'axios'
+
 /**
  * Git repo interface
  */
@@ -36,10 +36,7 @@ export class Git implements IGit {
   }
 
   async download(zipUrl: string, destPath: string): Promise<boolean> {
-    let res = await axios.get(zipUrl, {
-      responseType: 'blob',
-    })
-
+    let res = await getBinaryFromUrl(zipUrl)
     console.log("res:", res);
     
     return true

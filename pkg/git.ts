@@ -1,6 +1,5 @@
 import { WasmFs } from '@wasmer/wasmfs'
-import fetch from 'node-fetch'
-
+import  axios  from 'axios'
 /**
  * Git repo interface
  */
@@ -36,10 +35,13 @@ export class Git implements IGit {
     this.fs = fs
   }
 
-  async download(repoUrl: string, destPath: string): Promise<boolean> {
-    let repo = normalize(repoUrl)
-    let url = getUrl(repo, false)
-    await getBinaryFromUrl(url)
+  async download(zipUrl: string, destPath: string): Promise<boolean> {
+    let res = await axios.get(zipUrl, {
+      responseType: 'blob',
+    })
+
+    console.log("res:", res);
+    
     return true
   }
 }
@@ -51,9 +53,22 @@ export class Git implements IGit {
  * @return {Uint8Array}
  */
 async function getBinaryFromUrl(url: string): Promise<Uint8Array> {
-  const fetched = await fetch(url)
-  const buffer = await fetched.arrayBuffer()
-  return new Uint8Array(buffer)
+  console.log("url:", url);
+
+  try {
+    const fetched = await fetch(url, {
+      method: 'GET',
+      headers: {
+        accept: 'application/zip',
+      },
+      redirect: 'follow'
+    })
+
+    const buffer = await fetched.arrayBuffer()
+    return new Uint8Array(buffer)
+  } catch(e) {
+    console.log("fetched error: ", e)
+  }
 }
 
 /**

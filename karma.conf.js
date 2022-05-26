@@ -21,12 +21,12 @@ export default config => {
 
     // frameworks to use
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
-    frameworks: ['mocha'],
+    frameworks: ['jasmine'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      './scripts/karma-setup.js',
+    //  './scripts/karma-setup.js'
       { pattern: 'test/**/*.test.ts', watched: false },
     ],
 
@@ -39,7 +39,6 @@ export default config => {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-      './scripts/karma-setup.js': ['rollup2'],
       'test/**/*.test.ts': ['rollup2'],
     },
 
@@ -51,9 +50,10 @@ export default config => {
 			plugins: [
         polyfill(),
         resolve(),
+        commonjs(),
         typescript({
           extensions: extensions,
-          rollupCommonJSResolveHack: false,
+          rollupCommonJSResolveHack: true,
           clean: true
         })
       ],
@@ -63,6 +63,16 @@ export default config => {
 				sourcemap: 'inline',
 			},
 		},
+
+    client: {
+      jasmine: {
+        random: true,
+        seed: '4321',
+        oneFailurePerSpec: true,
+        failFast: true,
+        timeoutInterval: 1000
+      }
+    },
 
     // test results reporter to use
     // possible values: 'dots', 'progress'
@@ -84,7 +94,7 @@ export default config => {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: false,
+    autoWatch: true,
 
 
     // start these browsers

@@ -18,6 +18,7 @@ import typescript from 'rollup-plugin-typescript2';
 import { wasm } from '@rollup/plugin-wasm';
 // import smartAsset from "rollup-plugin-smart-asset"
 import url from '@rollup/plugin-url';
+import polyfill from 'rollup-plugin-polyfill-node';
 
 const LIBRARY_NAME = 'Library'; // Change with your library's name
 const EXTERNAL = []; // Indicate which modules should be treated as external
@@ -42,7 +43,7 @@ const makeConfig = (env = 'development') => {
     }
 
     const config = {
-        input: 'pkg/git.ts',
+        input: './pkg/git.ts',
         external: EXTERNAL,
         output: [
             {
@@ -82,12 +83,15 @@ const makeConfig = (env = 'development') => {
                 // limit: 0,
             }),
             // Uncomment the following 2 lines if your library has external dependencies
-            resolve(), // teach Rollup how to find external modules
+            resolve({
+                browser: true
+            }), // teach Rollup how to find external modules
             commonjs(),
             typescript({
                 rollupCommonJSResolveHack: false,
                 clean: true,          
-            })
+            }),
+            polyfill()
         ]
     };
 

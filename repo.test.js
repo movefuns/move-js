@@ -1,5 +1,5 @@
 import { WasmFs } from '@wasmer/wasmfs'
-import { Git } from "../pkg/git";
+import { Git } from "../pkg/git.ts";
 
 describe("Git", () => {
   let git;

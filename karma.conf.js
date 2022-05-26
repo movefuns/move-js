@@ -1,10 +1,18 @@
 // Karma configuration
 // Generated on Tue May 24 2022 14:32:56 GMT+0000 (Coordinated Universal Time)
 // process.env.CHROME_BIN = require('puppeteer').executablePath()
-var buble = require('rollup-plugin-buble');
-var resolve = require('@rollup/plugin-node-resolve').default;
+import resolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
+import typescript from 'rollup-plugin-typescript2';
+import polyfill from 'rollup-plugin-polyfill-node';
 
-module.exports = function(config) {
+const extensions = [
+  '.js',
+  '.ts',
+  '.tsx'
+]
+
+export default config => {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
@@ -13,12 +21,13 @@ module.exports = function(config) {
 
     // frameworks to use
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
-    frameworks: ['jasmine'],
+    frameworks: ['mocha'],
 
 
     // list of files / patterns to load in the browser
     files: [
-      { pattern: 'test/**/*.test.js', watched: false },
+      './scripts/karma-setup.js',
+      { pattern: 'test/**/*.test.ts', watched: false },
     ],
 
 
@@ -30,7 +39,8 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://www.npmjs.com/search?q=keywords:karma-preprocessor
     preprocessors: {
-      'test/**/*.test.js': ['rollup'],
+      './scripts/karma-setup.js': ['rollup2'],
+      'test/**/*.test.ts': ['rollup2'],
     },
 
     rollupPreprocessor: {
@@ -39,12 +49,17 @@ module.exports = function(config) {
 			 * except that `input` is handled for you.
 			 */
 			plugins: [
+        polyfill(),
         resolve(),
-        buble()
+        typescript({
+          extensions: extensions,
+          rollupCommonJSResolveHack: false,
+          clean: true
+        })
       ],
 			output: {
 				name: 'move-js',
-				format: 'iife',
+        format: 'iife',
 				sourcemap: 'inline',
 			},
 		},
@@ -52,7 +67,7 @@ module.exports = function(config) {
     // test results reporter to use
     // possible values: 'dots', 'progress'
     // available reporters: https://www.npmjs.com/search?q=keywords:karma-reporter
-    reporters: ['progress'],
+    reporters: ['mocha'],
 
 
     // web server port
@@ -65,16 +80,16 @@ module.exports = function(config) {
 
     // level of logging
     // possible values: config.LOG_DISABLE || config.LOG_ERROR || config.LOG_WARN || config.LOG_INFO || config.LOG_DEBUG
-    logLevel: config.LOG_DEBUG,
+    logLevel: config.LOG_INFO,
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
     // available browser launchers: https://www.npmjs.com/search?q=keywords:karma-launcher
-    browsers: [],
+    browsers: ['ChromeHeadless'],
 
 
     // Continuous Integration mode

@@ -2,8 +2,8 @@ import { WasmFs } from '@wasmer/wasmfs'
 import { Git } from "../pkg/git";
 
 describe("Git", () => {
-  let git;
-  let fs;
+  let git:Git;
+  let fs:WasmFs;
 
   beforeEach(async () => {
     fs = new WasmFs();

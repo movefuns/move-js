@@ -1,5 +1,4 @@
 import { WasmFs } from '@wasmer/wasmfs'
-import fetch from 'node-fetch'
 
 /**
  * Git repo interface

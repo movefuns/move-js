@@ -11,7 +11,7 @@ describe("Git", () => {
   });
 
   it("download github repo should be ok", async () => {
-    let ret = await git.download("https://github.com/yubing744/guide-to-move-package-manager.git", "/tmp/guide-to-move-package-manager");
+    let ret = await git.download("./test/data/my-counter.zip", "/tmp/guide-to-move-package-manager");
     expect(ret).toBeTruthy();
   });
 });

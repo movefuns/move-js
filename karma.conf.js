@@ -4,7 +4,8 @@
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
-import polyfill from 'rollup-plugin-polyfill-node';
+import globals from "rollup-plugin-node-globals";
+import builtins from "rollup-plugin-node-builtins";
 
 const extensions = [
   '.js',
@@ -48,10 +49,17 @@ export default config => {
 			 * except that `input` is handled for you.
 			 */
 			plugins: [
-        polyfill(),
-        resolve(),
-        commonjs(),
+        resolve({
+          preferBuiltins: true,
+          browser: true
+        }),
+        commonjs({
+          transformMixedEsModules:true
+        }),
+        globals(),
+        builtins(),
         typescript({
+          tsconfig: "./tsconfig.json",
           extensions: extensions,
           rollupCommonJSResolveHack: true,
           clean: true
@@ -94,7 +102,7 @@ export default config => {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
@@ -104,7 +112,7 @@ export default config => {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     // Concurrency level
     // how many browser instances should be started simultaneously

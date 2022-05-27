@@ -1,4 +1,5 @@
 import { WasmFs } from '@wasmer/wasmfs'
+import { extractContents } from "@wasmer/wasmfs/lib/tar";
 
 /**
  * Git repo interface
@@ -29,16 +30,20 @@ export interface IGit {
  * 
  */
 export class Git implements IGit {
-  public fs?: WasmFs
+  public wasmfs?: WasmFs
 
-  constructor(fs: WasmFs) {
-    this.fs = fs
+  constructor(wasmfs: WasmFs) {
+    this.wasmfs = wasmfs
   }
 
-  async download(repoUrl: string, destPath: string): Promise<boolean> {
-    let repo = normalize(repoUrl)
-    let url = getUrl(repo, false)
-    await getBinaryFromUrl(url)
+  async download(zipURL: string, destPath: string): Promise<boolean> {
+    let binary = await getBinaryFromUrl(zipURL)
+
+    this.wasmfs.fs.mkdirpSync(destPath);
+    
+    // We extract the contents on the desired directory
+    await extractContents(this.wasmfs, binary, destPath);
+
     return true
   }
 }

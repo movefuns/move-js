@@ -23,9 +23,8 @@ export default config => {
       { pattern: 'test/**/*.test.ts', watched: false },
 
       // loading assets, accessed like http://localhost:[PORT]/base/test/data/my-counter.zip
-      { pattern: 'test/data/*.zip', watched: false, included: false, served: true, nocache: false },
+      { pattern: 'test/**/*.zip', watched: false, included: false, served: true, nocache: false },
     ],
-
 
     // list of files / patterns to exclude
     exclude: [

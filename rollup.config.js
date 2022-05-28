@@ -1,26 +1,15 @@
-// import rust from "@wasm-tool/rollup-plugin-rust";
-
-// export default {
-//     input: {
-//         foo: "Cargo.toml",
-//     },
-//     plugins: [
-//         rust(),
-//     ],
-// };
-
+import globals from "@allex/rollup-plugin-node-globals";
+import builtins from "rollup-plugin-node-builtins";
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
-import babel from '@rollup/plugin-babel';
-import { terser } from 'rollup-plugin-terser';
-import pkg from './package.json';
 import typescript from 'rollup-plugin-typescript2';
-import { wasm } from '@rollup/plugin-wasm';
-// import smartAsset from "rollup-plugin-smart-asset"
-import url from '@rollup/plugin-url';
-import polyfill from 'rollup-plugin-polyfill-node';
 
-const LIBRARY_NAME = 'Library'; // Change with your library's name
+import pkg from './package.json';
+import url from '@rollup/plugin-url';
+
+import { terser } from 'rollup-plugin-terser';
+
+const LIBRARY_NAME = 'move'; // Change with your library's name
 const EXTERNAL = []; // Indicate which modules should be treated as external
 const GLOBALS = {}; // https://rollupjs.org/guide/en/#outputglobals
 
@@ -35,11 +24,19 @@ const banner = `/*!
  * @license ${pkg.license}
  */`;
 
+ const extensions = [
+    '.js',
+    '.ts',
+    '.tsx'
+  ]
+
 const makeConfig = (env = 'development') => {
     let bundleSuffix = '';
+    let sourcemapOption = 'inline'
 
     if (env === 'production') {
         bundleSuffix = 'min.';
+        sourcemapOption = undefined
     }
 
     const config = {
@@ -49,9 +46,19 @@ const makeConfig = (env = 'development') => {
             {
                 banner,
                 name: LIBRARY_NAME,
+                file: `dist/${LIBRARY_NAME}.iife.${bundleSuffix}js`, // IIFE
+                format: 'iife',
+                exports: 'auto',
+                sourcemap: sourcemapOption,
+                globals: GLOBALS
+            },
+            {
+                banner,
+                name: LIBRARY_NAME,
                 file: `dist/${LIBRARY_NAME}.umd.${bundleSuffix}js`, // UMD
                 format: 'umd',
                 exports: 'auto',
+                sourcemap: sourcemapOption,
                 globals: GLOBALS
             },
             {
@@ -59,6 +66,7 @@ const makeConfig = (env = 'development') => {
                 file: `dist/${LIBRARY_NAME}.cjs.${bundleSuffix}js`, // CommonJS
                 format: 'cjs',
                 exports: 'auto',
+                sourcemap: sourcemapOption,
                 globals: GLOBALS
             },
             {
@@ -66,32 +74,30 @@ const makeConfig = (env = 'development') => {
                 file: `dist/${LIBRARY_NAME}.esm.${bundleSuffix}js`, // ESM
                 format: 'es',
                 exports: 'named',
+                sourcemap: sourcemapOption,
                 globals: GLOBALS
             }
         ],
         plugins: [
-            // wasm({
-            //     maxFileSize: 1000000000,
-            // }),
-            // smartAsset({
-            //     url: 'inline',
-            //     extensions: ['.wasm'],
-            // }),
-            url({
-                include: ['**/*.wasm'],
-                limit: 14336000,
-                // limit: 0,
+            typescript({
+                tsconfig: "./tsconfig.json",
+                extensions: extensions,
+                clean: true
             }),
+            //url({
+            //    include: ['**/*.wasm'],
+            //    limit: 14336000,
+            //    // limit: 0,
+            //}),
             // Uncomment the following 2 lines if your library has external dependencies
             resolve({
-                browser: true
+                preferBuiltins: false,
             }), // teach Rollup how to find external modules
             commonjs(),
-            typescript({
-                rollupCommonJSResolveHack: false,
-                clean: true,          
-            }),
-            polyfill()
+            globals(),
+            builtins({
+                extensions
+            })
         ]
     };
 

@@ -39,8 +39,6 @@ export class Git implements IGit {
 
   async download(zipURL: string, destPath: string): Promise<void> {
     let binary = await getBinaryFromUrl(zipURL)
-    console.log("zip length: ", binary.length)
-
     this.wasmfs.fs.mkdirpSync(destPath);
     
     const zipReader = new zip.ZipReader(new zip.Uint8ArrayReader(binary));

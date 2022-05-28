@@ -1,16 +1,10 @@
 // Karma configuration
 // Generated on Tue May 24 2022 14:32:56 GMT+0000 (Coordinated Universal Time)
 // process.env.CHROME_BIN = require('puppeteer').executablePath()
-import resolve from '@rollup/plugin-node-resolve';
-import commonjs from '@rollup/plugin-commonjs';
-import typescript from 'rollup-plugin-typescript2';
-import polyfill from 'rollup-plugin-polyfill-node';
 
-const extensions = [
-  '.js',
-  '.ts',
-  '.tsx'
-]
+// load rollup config
+import rollupConfigFunc from './rollup.config.js';
+let rollupConfig = rollupConfigFunc({environment:"test"})[0]
 
 export default config => {
   config.set({
@@ -23,11 +17,13 @@ export default config => {
     // available frameworks: https://www.npmjs.com/search?q=keywords:karma-adapter
     frameworks: ['jasmine'],
 
-
     // list of files / patterns to load in the browser
     files: [
-    //  './scripts/karma-setup.js'
+      // glob test files
       { pattern: 'test/**/*.test.ts', watched: false },
+
+      // loading assets, accessed like http://localhost:[PORT]/base/test/data/my-counter.zip
+      { pattern: 'test/data/*.zip', watched: false, included: false, served: true, nocache: false },
     ],
 
 
@@ -47,18 +43,9 @@ export default config => {
 			 * This is just a normal Rollup config object,
 			 * except that `input` is handled for you.
 			 */
-			plugins: [
-        polyfill(),
-        resolve(),
-        commonjs(),
-        typescript({
-          extensions: extensions,
-          rollupCommonJSResolveHack: true,
-          clean: true
-        })
-      ],
+			plugins: rollupConfig.plugins,
 			output: {
-				name: 'move-js',
+				name: 'move',
         format: 'iife',
 				sourcemap: 'inline',
 			},
@@ -94,7 +81,7 @@ export default config => {
 
 
     // enable / disable watching file and executing tests whenever any file changes
-    autoWatch: true,
+    autoWatch: false,
 
 
     // start these browsers
@@ -104,7 +91,7 @@ export default config => {
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false,
+    singleRun: true,
 
     // Concurrency level
     // how many browser instances should be started simultaneously

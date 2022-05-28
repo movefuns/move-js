@@ -67,6 +67,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
+    "@iarna/toml": "^2.2.5",
     "@swc/helpers": "^0.3.13",
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasm-transformer": "^0.10.0",

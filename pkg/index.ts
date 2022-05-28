@@ -1,7 +1,7 @@
 import { WasmFs } from '@wasmer/wasmfs'
 
 export interface IMove {
-  run(args: String[])
+  run(args: String[]):void
 }
 
 export class Move implements IMove {
@@ -11,7 +11,7 @@ export class Move implements IMove {
     this.fs = fs
   }
 
-  run(args: String[]) {
+  run(args: String[]):void {
     throw new Error('Method not implemented.')
   }
 }

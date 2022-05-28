@@ -42,4 +42,21 @@ describe("Package", () => {
     expect(mp.dependencies.get("StarcoinFramework").git).toBe("https://github.com/starcoinorg/starcoin-framework.git")
     expect(mp.dependencies.get("StarcoinFramework").rev).toBe("cf1deda180af40a8b3e26c0c7b548c4c290cd7e7")
   });
+
+
+  it("build starcoin unit-test package should be ok", async () => {
+    await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
+ 
+    let mp = new MovePackage(wasmfs, "/workspace/unit-test")
+    mp.build()
+  });
+
+  /*
+  it("build starcoin framework should be ok", async () => {
+    await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
+ 
+    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework")
+    mp.build()
+  });
+  */
 });

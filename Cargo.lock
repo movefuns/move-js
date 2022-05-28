@@ -392,6 +392,7 @@ dependencies = [
  "once_cell",
  "regex",
  "tempfile",
+ "walkdir",
 ]
 
 [[package]]

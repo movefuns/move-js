@@ -1,32 +1,60 @@
+use std::env;
 use std::panic;
-use std::fs::File;
-use std::io::Write;
+use walkdir::WalkDir;
 use move_compiler::Compiler;
 use move_compiler::compiled_unit::CompiledUnit;
 use move_compiler::diagnostics::{unwrap_or_report_diagnostics, report_diagnostics_to_buffer};
+use move_compiler::shared::{Flags, NumericalAddress};
 
 use std::path::Path;
 use base64::{encode};
+use std::collections::{BTreeMap, HashMap};
 
 fn hook_impl(info: &panic::PanicInfo) {
     let _ = println!("{}", info);
 }
 
-fn compile(path: &Path) {
-    let targets: Vec<String> = vec![path.to_str().unwrap().to_owned()];
+pub fn starcoin_framework_named_addresses() -> BTreeMap<String, NumericalAddress> {
+    let mapping = [
+        ("VMReserved", "0x0"),
+        ("Genesis", "0x1"),
+        ("StarcoinFramework", "0x1"),
+        ("StarcoinAssociation", "0xA550C18"),
+    ];
+    mapping
+        .iter()
+        .map(|(name, addr)| (name.to_string(), NumericalAddress::parse_str(addr).unwrap()))
+        .collect()
+}
+
+fn compile_package(path: &Path) {
+    let mut targets: Vec<String> = vec![];
     let deps: Vec<String> = vec![];
 
-    let c = Compiler::new(&targets, &deps);
-    let (source_text, compiled_result) = c.build().expect("build fail");
+    let sources_dir = path.join("sources");
 
-    for (key, value) in &source_text {
-        println!("build result fileHash:{}, path: {}, content: {}", key, value.0, value.1);
+    for entry in WalkDir::new(sources_dir) {
+        let entry_ref = entry.as_ref();
+
+        if entry_ref.unwrap().path().is_file() {
+            let move_file_path = entry_ref.unwrap().path().to_str().unwrap().to_owned();
+            targets.push(move_file_path);
+        }
     }
+
+    println!("compile targets: {:?}", targets);
+
+    let c = Compiler::new(&targets, &deps)
+        .set_named_address_values(starcoin_framework_named_addresses())
+        .set_flags(Flags::empty()
+        .set_sources_shadow_deps(true));
+
+    let (source_text, compiled_result) = c.build().expect("build fail");
 
     let compiled_units = unwrap_or_report_diagnostics(&source_text, compiled_result);
 
     println!(
-        "{}",
+        "diagnostics result: {}",
         String::from_utf8_lossy(&report_diagnostics_to_buffer(
             &source_text,
             compiled_units.1
@@ -53,23 +81,12 @@ fn compile(path: &Path) {
 fn main() {
     panic::set_hook(Box::new(hook_impl));
 
-    let code = r#"
-    module 0x1::M {
-        struct M{
-            value: u64,
-        }
+    let args: Vec<String> = env::args().collect();
+    println!("args: {:?}", args);
 
-        public fun hello(){
-        }
-    }
-"#;
+    let pwd = env::var("PWD").expect("must has set PWD env");
+    let current_path = Path::new(&pwd);
+    println!("pwd: {:?}", current_path);
 
-
-    // write code to test.move
-    let mut file = File::create("/tmp/test.move").expect("create failed");
-    file.write_all(code.as_bytes()).expect("write failed");
-    
-    // compile test.move
-    let path = Path::new("/tmp/test.move");
-    compile(&path);
+    compile_package(&current_path);
 }

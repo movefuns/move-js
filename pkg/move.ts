@@ -69,5 +69,17 @@ export class Move implements IMove {
     // Output what's inside of /dev/stdout!
     let stdout = await this.wasmFs.getStdOut();
     console.log('Standard Output: ' + stdout);
+
+    let stderr = await this.getStdErr()
+    console.error('Standard Error: ' + stderr);
+  }
+
+  async getStdErr() {
+    let promise = new Promise(resolve => {
+        resolve(this.wasmFs.fs.readFileSync("/dev/stderr", "utf8"));
+    });
+    return promise;
   }
 }
+
+

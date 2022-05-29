@@ -16,6 +16,7 @@ fn starcoin_framework_named_addresses() -> BTreeMap<String, NumericalAddress> {
         ("Genesis", "0x1"),
         ("StarcoinFramework", "0x1"),
         ("StarcoinAssociation", "0xA550C18"),
+        ("Std", "0x1")
     ];
     mapping
         .iter()
@@ -33,7 +34,7 @@ fn save_under(root_path: &Path, file: &str, bytes: &[u8]) -> Result<()> {
     std::fs::write(path_to_save, bytes).map_err(|err| err.into())
 }
 
-pub fn compile_package(package_path: &str, install_dir: &str, target: &str) {
+pub fn compile_package(package_path: &str, install_dir: &str, target: &str, test_mode: bool) {
     let mut targets: Vec<String> = vec![];
     let deps: Vec<String> = vec![];
 
@@ -51,22 +52,28 @@ pub fn compile_package(package_path: &str, install_dir: &str, target: &str) {
 
     println!("compile targets: {:?}", targets);
 
+    let mut flags = Flags::empty()
+        .set_sources_shadow_deps(true);
+    if test_mode {
+        flags = Flags::testing()
+            .set_sources_shadow_deps(true);
+    }
+
     let c = Compiler::new(&targets, &deps)
         .set_named_address_values(starcoin_framework_named_addresses())
-        .set_flags(Flags::empty()
-        .set_sources_shadow_deps(true));
+        .set_flags(flags);
 
     let (source_text, compiled_result) = c.build().expect("build fail");
 
     let compiled_units = unwrap_or_report_diagnostics(&source_text, compiled_result);
 
-    println!(
-        "diagnostics result: {}",
-        String::from_utf8_lossy(&report_diagnostics_to_buffer(
-            &source_text,
-            compiled_units.1
-        ))
-    );
+    //println!(
+    //    "diagnostics result: {}",
+    //    String::from_utf8_lossy(&report_diagnostics_to_buffer(
+    //        &source_text,
+    //        compiled_units.1
+    //    ))
+    //);
 
     let mv_units:Vec<CompiledUnit> = compiled_units
         .0

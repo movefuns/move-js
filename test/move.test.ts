@@ -18,7 +18,7 @@ describe("Move", () => {
         pwd: "/workspace/unit-test"
     })
 
-    await cli.run()
+    await cli.run(["/workspace/starcoin-framework/build"])
   });
 
   it("run build starcoin-framework should be ok", async () => {
@@ -28,7 +28,7 @@ describe("Move", () => {
         pwd: "/workspace/starcoin-framework"
     })
     
-    await cli.run()
+    await cli.run(["/workspace/starcoin-framework/build"])
   });
 
 });

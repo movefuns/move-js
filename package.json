@@ -12,14 +12,14 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
+    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move-cli.wasm ./pkg/move_bg.wasm",
     "build": "npm run clean; npm run build-rc; rollup -c --environment BUILD:production",
-    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move.wasm ./pkg/move_bg.wasm",
-    "test": "npm run build-rc; babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
+    "test": "npm run clean; npm run build-rc; babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
     "lint": "run-s lint:ts:tslint lint:ts:preetier",
     "lint:js": "prettier --write pkg/**/*.js",
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist; rimraf pkg/*.wasm"
   },
   "author": "",
   "license": "ISC",

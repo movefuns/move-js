@@ -380,22 +380,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9be0862c1b3f26a88803c4a49de6889c10e608b3ee9344e6ef5b45fb37ad3d1"
 
 [[package]]
-name = "move"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64",
- "datatest-stable",
- "move-binary-format",
- "move-command-line-common",
- "move-compiler",
- "once_cell",
- "regex",
- "tempfile",
- "walkdir",
-]
-
-[[package]]
 name = "move-binary-format"
 version = "0.0.3"
 source = "git+https://github.com/starcoinorg/move?rev=8d559a83d5372d633fc7d85e8ae29c80d9d45dc1#8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"
@@ -443,6 +427,22 @@ dependencies = [
  "move-borrow-graph",
  "move-core-types",
  "petgraph",
+]
+
+[[package]]
+name = "move-cli"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "datatest-stable",
+ "move-binary-format",
+ "move-command-line-common",
+ "move-compiler",
+ "once_cell",
+ "regex",
+ "tempfile",
+ "walkdir",
 ]
 
 [[package]]

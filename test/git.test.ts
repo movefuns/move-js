@@ -1,8 +1,6 @@
 import { WasmFs } from '@wasmer/wasmfs'
 import { Git } from "../pkg/git";
 
-jasmine.DEFAULT_TIMEOUT_INTERVAL = 3000
-
 describe("Git", () => {
   let git:Git;
   let wasmfs:WasmFs;
@@ -27,5 +25,4 @@ describe("Git", () => {
     const MyCounterText = wasmfs.fs.readFileSync("/workspace/starcoin-framework/sources/Token.move", "utf8")
     expect(MyCounterText).toContain("struct Token<phantom TokenType> has store")
   });
-
 });

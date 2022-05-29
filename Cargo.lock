@@ -33,6 +33,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "08f9b8508dccb7687a1d6c4ce66b2b0ecef467c94667de27d8d7fe1f8d2a9cdc"
 
 [[package]]
+name = "args"
+version = "2.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "d4b7432c65177b8d5c032d56e020dd8d407e939468479fc8c300e2d93e6d970b"
+dependencies = [
+ "getopts",
+ "log",
+]
+
+[[package]]
 name = "arrayref"
 version = "0.3.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -258,6 +268,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "getopts"
+version = "0.2.21"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "14dbbfd5c71d70241ecf9e6f13737f7b5ce823821063188d7e46c41d371eebd5"
+dependencies = [
+ "unicode-width",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -378,21 +397,6 @@ name = "mirai-annotations"
 version = "1.12.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c9be0862c1b3f26a88803c4a49de6889c10e608b3ee9344e6ef5b45fb37ad3d1"
-
-[[package]]
-name = "move"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64",
- "datatest-stable",
- "move-binary-format",
- "move-command-line-common",
- "move-compiler",
- "once_cell",
- "regex",
- "tempfile",
-]
 
 [[package]]
 name = "move-binary-format"
@@ -556,6 +560,24 @@ source = "git+https://github.com/starcoinorg/move?rev=8d559a83d5372d633fc7d85e8a
 dependencies = [
  "once_cell",
  "serde",
+]
+
+[[package]]
+name = "move-web"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "args",
+ "base64",
+ "datatest-stable",
+ "getopts",
+ "move-binary-format",
+ "move-command-line-common",
+ "move-compiler",
+ "once_cell",
+ "regex",
+ "tempfile",
+ "walkdir",
 ]
 
 [[package]]

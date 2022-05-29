@@ -1115,6 +1115,11 @@
     minimatch "^3.0.4"
     strip-json-comments "^3.1.1"
 
+"@iarna/toml@^2.2.5":
+  version "2.2.5"
+  resolved "https://registry.yarnpkg.com/@iarna/toml/-/toml-2.2.5.tgz#b32366c89b43c6f8cefbdefac778b9c828e3ba8c"
+  integrity sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz#fd3db1d59ecf7cf121e80650bb86712f9b55eced"
@@ -1382,7 +1387,7 @@
     make-dir "^3.1.0"
     mime "^2.4.6"
 
-"@rollup/plugin-wasm@^5.1.2":
+"@rollup/plugin-wasm@^5.2.0":
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/@rollup/plugin-wasm/-/plugin-wasm-5.2.0.tgz#2bcd2de23c67b6067b1477566b680d677814a145"
   integrity sha512-PR3ff67ls2Kr9H04pZ24wJYPZq0YV+UHySpk7OuAJxyc7o5Q8NHFdwi4pfMtJkJkqfN1/QY/nq46SoRDoDvK2w==

@@ -12,14 +12,14 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
+    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move-web.wasm ./pkg/move_bg.wasm",
     "build": "npm run clean; npm run build-rc; rollup -c --environment BUILD:production",
-    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move.wasm ./pkg",
-    "test": "babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
+    "test": "npm run clean; npm run build-rc; babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
     "lint": "run-s lint:ts:tslint lint:ts:preetier",
     "lint:js": "prettier --write pkg/**/*.js",
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
-    "clean": "rimraf dist"
+    "clean": "rimraf dist; rimraf pkg/*.wasm"
   },
   "author": "",
   "license": "ISC",
@@ -38,7 +38,7 @@
     "@rollup/plugin-commonjs": "~21.0.1",
     "@rollup/plugin-node-resolve": "~13.0.6",
     "@rollup/plugin-url": "^6.1.0",
-    "@rollup/plugin-wasm": "^5.1.2",
+    "@rollup/plugin-wasm": "^5.2.0",
     "@types/jest": "^27.5.1",
     "@types/karma": "^5.0.1",
     "@types/mocha": "^8.2.0",
@@ -67,6 +67,7 @@
     "typescript": "^4.5.2"
   },
   "dependencies": {
+    "@iarna/toml": "^2.2.5",
     "@swc/helpers": "^0.3.13",
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasm-transformer": "^0.10.0",

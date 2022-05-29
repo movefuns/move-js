@@ -5,7 +5,7 @@ import commonjs from '@rollup/plugin-commonjs';
 import typescript from 'rollup-plugin-typescript2';
 
 import pkg from './package.json';
-import url from '@rollup/plugin-url';
+import { wasm } from '@rollup/plugin-wasm';
 
 import { terser } from 'rollup-plugin-terser';
 
@@ -40,7 +40,7 @@ const makeConfig = (env = 'development') => {
     }
 
     const config = {
-        input: './pkg/git.ts',
+        input: './pkg/move.ts',
         external: EXTERNAL,
         output: [
             {
@@ -79,16 +79,14 @@ const makeConfig = (env = 'development') => {
             }
         ],
         plugins: [
+            wasm({
+                targetEnv: "auto-inline"
+            }),
             typescript({
                 tsconfig: "./tsconfig.json",
                 extensions: extensions,
                 clean: true
             }),
-            //url({
-            //    include: ['**/*.wasm'],
-            //    limit: 14336000,
-            //    // limit: 0,
-            //}),
             // Uncomment the following 2 lines if your library has external dependencies
             resolve({
                 preferBuiltins: false,

@@ -11,6 +11,7 @@ describe("Move", () => {
     git = new Git(wasmfs);
   });
 
+  /*
   it("run build unit-test should be ok", async () => {
     await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
  
@@ -18,9 +19,14 @@ describe("Move", () => {
         pwd: "/workspace/unit-test"
     })
 
-    await cli.run(["/workspace/starcoin-framework/build"])
-  });
+    await cli.run(["--install_dir", "/workspace/unit-test/build"])
 
+    const unitTestExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/build/UnitTest.mv")
+    expect(unitTestExists).toBeTruthy()
+
+  });
+  */
+ 
   it("run build starcoin-framework should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
@@ -28,7 +34,10 @@ describe("Move", () => {
         pwd: "/workspace/starcoin-framework"
     })
     
-    await cli.run(["/workspace/starcoin-framework/build"])
+    await cli.run(["--install_dir", "/workspace/starcoin-framework/build"])
+
+    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/build/NFT.mv")
+    expect(ntfExists).toBeTruthy()
   });
 
 });

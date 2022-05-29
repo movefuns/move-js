@@ -430,22 +430,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "move-cli"
-version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64",
- "datatest-stable",
- "move-binary-format",
- "move-command-line-common",
- "move-compiler",
- "once_cell",
- "regex",
- "tempfile",
- "walkdir",
-]
-
-[[package]]
 name = "move-command-line-common"
 version = "0.1.0"
 source = "git+https://github.com/starcoinorg/move?rev=8d559a83d5372d633fc7d85e8ae29c80d9d45dc1#8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"
@@ -557,6 +541,23 @@ source = "git+https://github.com/starcoinorg/move?rev=8d559a83d5372d633fc7d85e8a
 dependencies = [
  "once_cell",
  "serde",
+]
+
+[[package]]
+name = "move-web"
+version = "0.1.0"
+dependencies = [
+ "anyhow",
+ "base64",
+ "clap 3.1.18",
+ "datatest-stable",
+ "move-binary-format",
+ "move-command-line-common",
+ "move-compiler",
+ "once_cell",
+ "regex",
+ "tempfile",
+ "walkdir",
 ]
 
 [[package]]

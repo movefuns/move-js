@@ -33,7 +33,7 @@ fn save_under(root_path: &Path, file: &str, bytes: &[u8]) -> Result<()> {
     std::fs::write(path_to_save, bytes).map_err(|err| err.into())
 }
 
-pub fn compile_package(package_path: &str, install_dir: &str) {
+pub fn compile_package(package_path: &str, install_dir: &str, target: &str) {
     let mut targets: Vec<String> = vec![];
     let deps: Vec<String> = vec![];
 

@@ -12,7 +12,7 @@
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
-    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move-cli.wasm ./pkg/move_bg.wasm",
+    "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move-web.wasm ./pkg/move_bg.wasm",
     "build": "npm run clean; npm run build-rc; rollup -c --environment BUILD:production",
     "test": "npm run clean; npm run build-rc; babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
     "lint": "run-s lint:ts:tslint lint:ts:preetier",

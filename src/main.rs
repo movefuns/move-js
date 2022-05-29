@@ -15,8 +15,8 @@ fn main() {
     let args: Vec<String> = env::args().collect();
     println!("args: {:?}", args);
 
-    let install_dir = args[0].as_str();
+    let install_dir = args[1].as_str();
     println!("install_dir: {:?}", install_dir);
 
-    move_cli::compile_package(&pwd, install_dir);
+    move_web::compile_package(&pwd, install_dir, "starcoin");
 }

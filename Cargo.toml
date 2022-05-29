@@ -1,5 +1,5 @@
 [package]
-name = "move-cli"
+name = "move-web"
 version = "0.1.0"
 edition = "2021"
 
@@ -13,6 +13,11 @@ regex = { version = "1.5.4", default-features = false, features = ["std", "perf"
 datatest-stable = "0.1.1"
 base64 = "0.13.0"
 walkdir = "2"
+clap = { version = "3", features = ["derive"] }
 move-compiler = { package="move-compiler", git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"  }
 move-command-line-common = {git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"}
 move-binary-format = { git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"  }
+
+[[bin]]
+name = "move-web"
+path = "src/main.rs"

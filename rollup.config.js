@@ -40,7 +40,7 @@ const makeConfig = (env = 'development') => {
     }
 
     const config = {
-        input: './pkg/move.ts',
+        input: './pkg/index.ts',
         external: EXTERNAL,
         output: [
             {

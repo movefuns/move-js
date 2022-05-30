@@ -1,14 +1,15 @@
 {
-  "name": "wasmer-js",
+  "name": "move-js",
   "version": "0.1.0",
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/yubing744/move-js"
   },
-  "source": "pkg/index.ts",
-  "module": "dist/module.js",
-  "main": "dist/main.js",
+  "main": "dist/move.cjs.js",
+  "module": "dist/move.esm.js",
+  "iife": "dist/move.iife.js",
+  "typings": "dist/index.d.ts",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
@@ -71,7 +72,6 @@
     "@swc/helpers": "^0.3.13",
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasm-transformer": "^0.10.0",
-    "@wasmer/wasmfs": "^0.12.0",
-    "node-fetch": "^3.2.4"
+    "@wasmer/wasmfs": "^0.12.0"
   }
 }

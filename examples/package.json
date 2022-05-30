@@ -1,10 +1,9 @@
 {
-  "name": "wasmer-js-examples",
+  "name": "move-js-examples",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/wasmer-js-move-compile-demo.wasm ./static",
     "dev": "parcel index.html",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -12,14 +11,10 @@
   "license": "ISC",
   "browserslist": "> 0.25%, not dead",
   "devDependencies": {
-    "parcel": "^2.4.1"
+    "parcel": "^2.6.0",
+    "process": "^0.11.10"
   },
   "alias": {
     "move-js": ".."
-  },
-  "dependencies": {
-    "@wasmer/wasi": "^0.12.0",
-    "@wasmer/wasm-transformer": "^0.10.0",
-    "@wasmer/wasmfs": "^0.12.0"
   }
 }

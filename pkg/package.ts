@@ -39,12 +39,14 @@ export class MovePackage implements IMovePackage {
     let tomlContent = wasmfs.fs.readFileSync(tomlPath, "utf-8")
     this.parseToml(tomlContent.toString())
 
-    this.packageAlias = new Map<string, string>();
+    let packageAlias = new Map<string, string>();
     if (alias != null) {
       alias.forEach(function(val: string, key: string){
-        this.packageAlias[key] = val;
+        packageAlias.set(key, val);
       });
     }
+
+    this.packageAlias = packageAlias
   }
 
   parseToml(tomlContent: string):void {
@@ -108,16 +110,21 @@ export class MovePackage implements IMovePackage {
   }
 
   collectDependencies(allDeps: Array<string>, modules: Map<string, IDependency>) {
+    let packageAlias = this.packageAlias
+    
     if (modules) {
       modules.forEach((dep: IDependency, key: string) => {
-        let aliasPath = this.packageAlias.get(key)
+        let aliasPath = packageAlias.get(key)
+
         if (aliasPath != null) {
+          allDeps.push(aliasPath)
+
           let mp = new MovePackage(this.wasmfs, aliasPath)
           let deps = mp.getDeps();
           if (deps) {
-            for (let dep in deps) {
+            deps.forEach(function(dep: string){
               allDeps.push(dep)
-            }
+            });
           }
   
           return
@@ -125,12 +132,14 @@ export class MovePackage implements IMovePackage {
   
         if (dep.local) {
           let depPath = path.join(this.packagePath, dep.local)
+          allDeps.push(depPath)
+
           let mp = new MovePackage(this.wasmfs, depPath)
           let deps = mp.getDeps();
           if (deps) {
-            for (let dep in deps) {
+            deps.forEach(function(dep: string){
               allDeps.push(dep)
-            }
+            });
           }
         } 
       })

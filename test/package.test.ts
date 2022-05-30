@@ -67,9 +67,10 @@ describe("Package", () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
  
-    let alias = new Map<string, string>()
-    alias.set("StarcoinFramework", "/workspace/starcoin-framework")
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", alias)
+    let initAlias = new Map<string, string>()
+    initAlias.set("StarcoinFramework", "/workspace/starcoin-framework")
+
+    let mp = new MovePackage(wasmfs, "/workspace/my-counter", initAlias)
     await mp.build()
   });
 

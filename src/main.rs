@@ -6,7 +6,6 @@ use std::env;
 use std::panic;
 use getopts::Occur;
 use args::Args;
-use std::str::Split;
 
 const PROGRAM_DESC: &'static str = "Run this program";
 const PROGRAM_NAME: &'static str = "program";

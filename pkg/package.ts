@@ -1,6 +1,8 @@
-import { WasmFs } from '@wasmer/wasmfs'
 import * as path from 'path'
 import * as TOML from '@iarna/toml'
+import { WasmFs } from '@wasmer/wasmfs'
+import { Move } from "../pkg/move";
+
 
 export interface IDependency {
   git?:string
@@ -27,14 +29,22 @@ export class MovePackage implements IMovePackage {
 
   private wasmfs:WasmFs
   private packagePath: string
+  private packageAlias: Map<string, string>
 
-  constructor(wasmfs:WasmFs, packagePath:string) {
+  constructor(wasmfs:WasmFs, packagePath:string, alias?:Map<string, string>) {
     this.wasmfs = wasmfs
     this.packagePath = packagePath
 
     let tomlPath = path.join(packagePath, "Move.toml")
     let tomlContent = wasmfs.fs.readFileSync(tomlPath, "utf-8")
     this.parseToml(tomlContent.toString())
+
+    this.packageAlias = new Map<string, string>();
+    if (alias != null) {
+      alias.forEach(function(val: string, key: string){
+        this.packageAlias[key] = val;
+      });
+    }
   }
 
   parseToml(tomlContent: string):void {
@@ -82,27 +92,64 @@ export class MovePackage implements IMovePackage {
     }
   }
 
-  build(): void {
-    this.buildDependencies(this.dependencies)
-    this.buildDependencies(this.devDependencies)
-    this.buildCurrent()
+  public async build(): Promise<void> {
+    let deps = this.getDeps()
+    console.log("build deps:", deps)
+    await this.buildPackage(this.wasmfs, this.packagePath, deps)
   }
 
-  buildDependencies(deps: Map<string, IDependency>) {
-    if (deps) {
-      deps.forEach((value: IDependency, key: string, map: Map<string, IDependency>) => {
-        let dep = deps.get(key)
+  public getDeps(): Array<string> {
+    let deps = new Array<string>();
 
+    this.collectDependencies(deps, this.dependencies)
+    this.collectDependencies(deps, this.devDependencies)
+    
+    return deps
+  }
+
+  collectDependencies(allDeps: Array<string>, modules: Map<string, IDependency>) {
+    if (modules) {
+      modules.forEach((dep: IDependency, key: string) => {
+        let aliasPath = this.packageAlias.get(key)
+        if (aliasPath != null) {
+          let mp = new MovePackage(this.wasmfs, aliasPath)
+          let deps = mp.getDeps();
+          if (deps) {
+            for (let dep in deps) {
+              allDeps.push(dep)
+            }
+          }
+  
+          return
+        }
+  
         if (dep.local) {
           let depPath = path.join(this.packagePath, dep.local)
           let mp = new MovePackage(this.wasmfs, depPath)
-          mp.build()
-        }
+          let deps = mp.getDeps();
+          if (deps) {
+            for (let dep in deps) {
+              allDeps.push(dep)
+            }
+          }
+        } 
       })
     }
   }
 
-  buildCurrent() {
+  async buildPackage(wasmfs:WasmFs, packagePath:string, deps: Array<string>): Promise<void> {
     console.log("Building ", this.name)
+  
+    let cli = new Move(wasmfs, {
+        pwd: packagePath,
+        preopens: ["/workspace"]
+    })
+  
+    let dep_dirs = deps.join(",")
+    await cli.run(["--install_dir", "build", "--dependency_dirs", dep_dirs])
   }
 }
+
+
+
+

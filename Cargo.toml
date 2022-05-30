@@ -1,7 +1,7 @@
 [package]
 name = "move-web"
 version = "0.1.0"
-edition = "2022"
+edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -15,9 +15,9 @@ base64 = "0.13.0"
 walkdir = "2"
 getopts = "0.2"
 args = "2.0"
-move-compiler = { package="move-compiler", git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"  }
-move-command-line-common = {git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"}
-move-binary-format = { git = "https://github.com/starcoinorg/move", rev = "8d559a83d5372d633fc7d85e8ae29c80d9d45dc1"  }
+move-compiler = { package="move-compiler", git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"  }
+move-command-line-common = {git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"}
+move-binary-format = { git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"  }
 
 [[bin]]
 name = "move-web"

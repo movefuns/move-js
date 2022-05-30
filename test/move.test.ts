@@ -19,7 +19,7 @@ describe("Move", () => {
         pwd: "/workspace/unit-test"
     })
 
-    await cli.run(["--install_dir", "/workspace/unit-test/build", "--test", "true"])
+    await cli.run(["--install_dir", "build", "--test", "true"])
 
     const unitTestExists = wasmfs.fs.existsSync("/workspace/unit-test/build/UnitTest.mv")
     expect(unitTestExists).toBeTruthy()
@@ -33,10 +33,27 @@ describe("Move", () => {
         pwd: "/workspace/starcoin-framework"
     })
     
-    await cli.run(["--install_dir", "/workspace/starcoin-framework/build"])
+    await cli.run(["--install_dir", "build"])
 
     const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/build/NFT.mv")
     expect(ntfExists).toBeTruthy()
   });
+
+
+  it("run build my-counter example should be ok", async () => {
+    await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
+    await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
+ 
+    let cli = new Move(wasmfs, {
+        pwd: "/workspace/my-counter",
+        preopens: ["/workspace/starcoin-framework"]
+    })
+    
+    await cli.run(["--install_dir", "build", "--dependency_dirs", "/workspace/starcoin-framework"])
+
+    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/build/MyCounter.mv")
+    expect(ntfExists).toBeTruthy()
+  });
+
 
 });

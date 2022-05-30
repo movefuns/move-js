@@ -1,5 +1,5 @@
 
-import { WASI } from '@wasmer/wasi/lib'
+import { WASI, WASIPreopenedDirs } from '@wasmer/wasi/lib'
 import browserBindings from '@wasmer/wasi/lib/bindings/browser'
 import { lowerI64Imports } from "@wasmer/wasm-transformer"
 import { WasmFs } from '@wasmer/wasmfs'
@@ -10,7 +10,8 @@ export interface IMove {
 }
 
 export interface IMoveOption {
-    pwd?: string
+    pwd?: string,
+    preopens?: [String]
 }
 
 export class Move implements IMove {
@@ -31,10 +32,22 @@ export class Move implements IMove {
 
   async run(args?: string[]): Promise<void> {
     let opts = this.opts
+
+    let preopens:WASIPreopenedDirs = {}
+    if (opts.preopens) {
+      preopens[opts.pwd] = opts.pwd
+
+      opts.preopens.forEach(function (value:string) {
+        preopens[value] = value
+      });
+    } else {
+      preopens[opts.pwd] = opts.pwd
+    }
+
+    console.log("preopens:", preopens)
+
     let wasi = new WASI({
-        preopens: {
-            [opts.pwd]: opts.pwd
-        },
+        preopens: preopens,
         
         // Arguments passed to the Wasm Module
         // The first argument is usually the filepath to the executable WASI module
@@ -78,6 +91,7 @@ export class Move implements IMove {
     let promise = new Promise(resolve => {
         resolve(this.wasmFs.fs.readFileSync("/dev/stderr", "utf8"));
     });
+
     return promise;
   }
 }

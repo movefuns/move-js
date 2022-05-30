@@ -18,7 +18,13 @@ fn parse_args() -> Args {
         "Installation directory for compiled artifacts. Defaults to current directory",
         "",
         Occur::Req,
-        Some(String::from("./build")));
+        Some(String::from("build")));
+    args.option("",
+        "dependency_dirs",
+        "dependency Directory",
+        "",
+        Occur::Optional,
+        Some(String::from("")));
     args.option("",
         "target",
         "Compile target platform, like starcoin",
@@ -40,7 +46,7 @@ fn hook_impl(info: &panic::PanicInfo) {
     let _ = println!("{}", info);
 }
 
-fn main() {
+fn main() -> std::io::Result<()>{
     panic::set_hook(Box::new(hook_impl));
 
     let pwd = env::var("PWD").expect("must has set PWD env");
@@ -48,9 +54,18 @@ fn main() {
 
     let args = parse_args();
 
-    let default_install_dir = String::from("./build");
+    let default_install_dir = String::from("build");
     let install_dir = args.value_of::<String>(&"install_dir").unwrap_or(default_install_dir);
     println!("install_dir: {:?}", install_dir);
+
+    let default_deps = String::from("");
+    let mut dependency_dirs:Vec<&str> = vec![];
+    let dependency_dirs_text = args.value_of::<String>(&"dependency_dirs").unwrap_or(default_deps);
+    if dependency_dirs_text != "" {
+        dependency_dirs = dependency_dirs_text.as_str().split(",").collect();
+    }
+    println!("dependency_dirs: {:?}", dependency_dirs);
+    
 
     let default_target = String::from("starcoin");
     let target = args.value_of::<String>(&"target").unwrap_or(default_target);
@@ -59,5 +74,7 @@ fn main() {
     let test_mode = args.value_of::<bool>("test").unwrap_or(false);
     println!("test_mode: {:?}", test_mode);
 
-    move_web::compile_package(&pwd, &install_dir, &target, test_mode);
+    move_web::compile_package(&pwd, &install_dir, dependency_dirs, &target, test_mode);
+
+    Ok(())
 }

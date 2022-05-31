@@ -1,14 +1,15 @@
 {
-  "name": "wasmer-js",
+  "name": "move-js",
   "version": "0.1.0",
   "description": "",
   "repository": {
     "type": "git",
     "url": "https://github.com/yubing744/move-js"
   },
-  "source": "pkg/index.ts",
-  "module": "dist/module.js",
-  "main": "dist/main.js",
+  "main": "dist/move.cjs.js",
+  "module": "dist/move.esm.js",
+  "iife": "dist/move.iife.js",
+  "types": "dist/types/index.d.ts",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
@@ -19,7 +20,8 @@
     "lint:js": "prettier --write pkg/**/*.js",
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
-    "clean": "rimraf dist; rimraf pkg/*.wasm"
+    "clean": "rimraf dist; rimraf pkg/*.wasm",
+    "dts":"tsc -b ./tsconfig.types.json"
   },
   "author": "",
   "license": "ISC",
@@ -71,7 +73,6 @@
     "@swc/helpers": "^0.3.13",
     "@wasmer/wasi": "^0.12.0",
     "@wasmer/wasm-transformer": "^0.10.0",
-    "@wasmer/wasmfs": "^0.12.0",
-    "node-fetch": "^3.2.4"
+    "@wasmer/wasmfs": "^0.12.0"
   }
 }

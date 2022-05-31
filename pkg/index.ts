@@ -1,7 +1,9 @@
-import { WasmFs } from '@wasmer/wasmfs'
-import { extractContents } from "@wasmer/wasmfs/lib/tar";
+import { Git } from "./git";
+import { Move } from "./move";
+import { MovePackage } from "./package";
 
 export default {
-    WasmFs,
-    extractContents
+    Git,
+    Move,
+    MovePackage
 };

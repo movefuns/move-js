@@ -40,6 +40,17 @@
     pako "^1.0.11"
     tar-stream "^2.1.0"
 
+"@yubing744/move-js@^0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@yubing744/move-js/-/move-js-0.1.0.tgz#42c93cf844f7bfe5ab30a16892b210775db617c3"
+  integrity sha512-oWnRe/JFjGAGku7dgUwGvUb2Tc+aEfrRT0+d912XSFCssgKcN3yuT9eYvWLob6O6bG6FM98xDny4gvukJKDLyg==
+  dependencies:
+    "@iarna/toml" "^2.2.5"
+    "@swc/helpers" "^0.3.13"
+    "@wasmer/wasi" "^0.12.0"
+    "@wasmer/wasm-transformer" "^0.10.0"
+    "@wasmer/wasmfs" "^0.12.0"
+
 base64-js@^1.3.1:
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.5.1.tgz#1b1b440160a5bf7ad40b650f095963481903930a"
@@ -261,15 +272,6 @@ memfs@3.0.4:
   dependencies:
     fast-extend "1.0.2"
     fs-monkey "0.3.3"
-
-move-js@../../:
-  version "0.1.0"
-  dependencies:
-    "@iarna/toml" "^2.2.5"
-    "@swc/helpers" "^0.3.13"
-    "@wasmer/wasi" "^0.12.0"
-    "@wasmer/wasm-transformer" "^0.10.0"
-    "@wasmer/wasmfs" "^0.12.0"
 
 nanoid@^3.3.4:
   version "3.3.4"

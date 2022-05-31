@@ -1,18 +1,32 @@
 {
-  "name": "move-js",
+  "name": "@yubing744/move-js",
   "version": "0.1.0",
-  "description": "",
+  "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
+  "keywords": [
+    "move",
+    "rust",
+    "starcoin",
+    "smart contracts",
+    "facebook",
+    "diem",
+    "blockchain"
+  ],
+  "files": [
+    "dist",
+    "package.json",
+    "LICENSE",
+    "README.md"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/yubing744/move-js"
   },
-  "main": "dist/move.cjs.js",
-  "module": "dist/move.esm.js",
-  "iife": "dist/move.iife.js",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.esm.js",
+  "iife": "dist/index.iife.js",
   "types": "dist/types/index.d.ts",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
-    "watch": "parcel watch",
     "build-rc": "cargo +nightly build -Zbuild-std=std,panic_abort --target=wasm32-wasi --release; cp ./target/wasm32-wasi/release/move-web.wasm ./pkg/move_bg.wasm",
     "build": "npm run clean; npm run build-rc; rollup -c --environment BUILD:production",
     "test": "npm run clean; npm run build-rc; babel-node --presets @babel/preset-env -- ./node_modules/karma/bin/karma start karma.conf.js",
@@ -21,10 +35,10 @@
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
     "clean": "rimraf dist; rimraf pkg/*.wasm",
-    "dts":"tsc -b ./tsconfig.types.json"
+    "publish": "npm publish --access=public"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "yubing744@163.com",
+  "license": "Apache License Version 2.0",
   "peerDependencies": {
     "rollup": "2.x.x"
   },

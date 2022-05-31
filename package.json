@@ -9,7 +9,7 @@
   "main": "dist/move.cjs.js",
   "module": "dist/move.esm.js",
   "iife": "dist/move.iife.js",
-  "typings": "dist/index.d.ts",
+  "typings": "lib/index.d.ts",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",

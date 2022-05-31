@@ -10,7 +10,7 @@ import { wasm } from '@rollup/plugin-wasm';
 import { terser } from 'rollup-plugin-terser';
 
 const LIBRARY_NAME = 'move'; // Change with your library's name
-const EXTERNAL = []; // Indicate which modules should be treated as external
+const EXTERNAL = ["@wasmer/wasmfs","@wasmer/wasi"]; // Indicate which modules should be treated as external
 const GLOBALS = {}; // https://rollupjs.org/guide/en/#outputglobals
 
 const banner = `/*!

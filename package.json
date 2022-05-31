@@ -9,7 +9,7 @@
   "main": "dist/move.cjs.js",
   "module": "dist/move.esm.js",
   "iife": "dist/move.iife.js",
-  "typings": "lib/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "browserslist": "> 0.25%, not dead",
   "scripts": {
     "watch": "parcel watch",
@@ -20,7 +20,8 @@
     "lint:js": "prettier --write pkg/**/*.js",
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
-    "clean": "rimraf dist; rimraf pkg/*.wasm"
+    "clean": "rimraf dist; rimraf pkg/*.wasm",
+    "dts":"tsc -b ./tsconfig.types.json"
   },
   "author": "",
   "license": "ISC",

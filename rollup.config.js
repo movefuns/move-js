@@ -9,7 +9,7 @@ import { wasm } from '@rollup/plugin-wasm';
 
 import { terser } from 'rollup-plugin-terser';
 
-const LIBRARY_NAME = 'move'; // Change with your library's name
+const LIBRARY_NAME = 'index'; // Change with your library's name
 const EXTERNAL = ["@wasmer/wasmfs","@wasmer/wasi"]; // Indicate which modules should be treated as external
 const GLOBALS = {}; // https://rollupjs.org/guide/en/#outputglobals
 
@@ -84,6 +84,7 @@ const makeConfig = (env = 'development') => {
             }),
             typescript({
                 tsconfig: "./tsconfig.json",
+                useTsconfigDeclarationDir: true,
                 extensions: extensions,
                 clean: true
             }),

@@ -1,7 +1,6 @@
 
 import { WASI, WASIPreopenedDirs } from '@wasmer/wasi/lib'
 import browserBindings from '@wasmer/wasi/lib/bindings/browser'
-import { lowerI64Imports } from "@wasmer/wasm-transformer"
 import { WasmFs } from '@wasmer/wasmfs'
 import loadMoveWasmModule from './move_bg'
 

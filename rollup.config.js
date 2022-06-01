@@ -42,6 +42,7 @@ const makeConfig = (env = 'development') => {
     const config = {
         input: './pkg/index.ts',
         external: EXTERNAL,
+        sourceMap: true,
         output: [
             {
                 banner,

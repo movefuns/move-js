@@ -13,6 +13,8 @@
   ],
   "files": [
     "dist",
+    "src",
+    "pkg",
     "package.json",
     "LICENSE",
     "README.md"

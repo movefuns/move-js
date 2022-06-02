@@ -95,12 +95,13 @@ export class MovePackage implements IMovePackage {
   }
 
   public async build(): Promise<void> {
-    let deps = this.getDeps()
-    console.log("build deps:", deps)
-    await this.buildPackage(this.wasmfs, this.packagePath, deps)
+    let deps = this.getAllDeps()
+    let addresses = this.getAllAddresses()
+
+    await this.buildPackage(this.wasmfs, this.packagePath, deps, addresses)
   }
 
-  public getDeps(): Array<string> {
+  public getAllDeps(): Array<string> {
     let deps = new Array<string>();
 
     this.collectDependencies(deps, this.dependencies)
@@ -120,7 +121,7 @@ export class MovePackage implements IMovePackage {
           allDeps.push(aliasPath)
 
           let mp = new MovePackage(this.wasmfs, aliasPath)
-          let deps = mp.getDeps();
+          let deps = mp.getAllDeps();
           if (deps) {
             deps.forEach(function(dep: string){
               allDeps.push(dep)
@@ -135,7 +136,7 @@ export class MovePackage implements IMovePackage {
           allDeps.push(depPath)
 
           let mp = new MovePackage(this.wasmfs, depPath)
-          let deps = mp.getDeps();
+          let deps = mp.getAllDeps();
           if (deps) {
             deps.forEach(function(dep: string){
               allDeps.push(dep)
@@ -146,7 +147,53 @@ export class MovePackage implements IMovePackage {
     }
   }
 
-  async buildPackage(wasmfs:WasmFs, packagePath:string, deps: Array<string>): Promise<void> {
+  public getAllAddresses(): Map<string, string> {
+    let allAddresses = new Map<string, string>();
+
+    this.addresses.forEach(function(val:string, key:string){
+      allAddresses.set(key, val)
+    })
+
+    this.collectAddresses(allAddresses, this.dependencies)
+    this.collectAddresses(allAddresses, this.devDependencies)
+
+    return allAddresses
+  }
+
+  collectAddresses(allAddresss: Map<string, string>, modules: Map<string, IDependency>) {
+    let packageAlias = this.packageAlias
+    
+    if (modules) {
+      modules.forEach((dep: IDependency, key: string) => {
+        let aliasPath = packageAlias.get(key)
+
+        if (aliasPath != null) {
+          let mp = new MovePackage(this.wasmfs, aliasPath)
+          let addresses = mp.getAllAddresses();
+          if (addresses) {
+            addresses.forEach(function(val:string, key:string){
+              allAddresss.set(key, val)
+            });
+          }
+  
+          return
+        }
+  
+        if (dep.local) {
+          let depPath = path.join(this.packagePath, dep.local)
+          let mp = new MovePackage(this.wasmfs, depPath)
+          let addresses = mp.getAllAddresses();
+          if (addresses) {
+            addresses.forEach(function(val:string, key:string){
+              allAddresss.set(key, val)
+            });
+          }
+        } 
+      })
+    }
+  }
+
+  async buildPackage(wasmfs:WasmFs, packagePath:string, deps: Array<string>, addresses: Map<string, string>): Promise<void> {
     console.log("Building ", this.name)
   
     let cli = new Move(wasmfs, {
@@ -155,7 +202,16 @@ export class MovePackage implements IMovePackage {
     })
   
     let dep_dirs = deps.join(",")
-    await cli.run(["--install_dir", "build", "--dependency_dirs", dep_dirs])
+    let address_maps = new Array<string>()
+    addresses.forEach(function(val:string, key:string){
+      address_maps.push(key + ":" + val)
+    })
+    let address_args = address_maps.join(",")
+
+    console.log("build deps:", dep_dirs)
+    console.log("build addresses:", address_args)
+
+    await cli.run(["--install_dir", "build", "--dependency_dirs", dep_dirs, "--address_maps", address_args])
   }
 }
 

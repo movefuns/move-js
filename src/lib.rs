@@ -11,16 +11,8 @@ use std::{
 
 use std::path::Path;
 
-fn starcoin_framework_named_addresses() -> BTreeMap<String, NumericalAddress> {
-    let mapping = [
-        ("VMReserved", "0x0"),
-        ("Genesis", "0x1"),
-        ("StarcoinFramework", "0x1"),
-        ("StarcoinAssociation", "0xA550C18"),
-        ("Std", "0x1"),
-        ("MyCounter", "0xABCDE"),
-    ];
-    mapping
+fn starcoin_framework_named_addresses(address_maps: Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
+    address_maps
         .iter()
         .map(|(name, addr)| (name.to_string(), NumericalAddress::parse_str(addr).unwrap()))
         .collect()
@@ -36,7 +28,7 @@ fn save_under(root_path: &Path, file: &str, bytes: &[u8]) -> Result<()> {
     std::fs::write(path_to_save, bytes).map_err(|err| err.into())
 }
 
-pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>, target: &str, test_mode: bool) {
+pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>, address_maps: Vec<(&str, &str)>, target: &str, test_mode: bool) {
     let mut targets: Vec<String> = vec![];
     let mut deps: Vec<String> = vec![];
 
@@ -78,7 +70,7 @@ pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>
     }
 
     let c = Compiler::new(&targets, &deps)
-        .set_named_address_values(starcoin_framework_named_addresses())
+        .set_named_address_values(starcoin_framework_named_addresses(address_maps))
         .set_flags(flags);
 
     let (source_text, compiled_result) = c.build().expect("build fail");

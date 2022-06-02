@@ -26,6 +26,12 @@ fn parse_args() -> Args {
         Occur::Optional,
         Some(String::from("")));
     args.option("",
+        "address_maps",
+        "address maps",
+        "",
+        Occur::Optional,
+        Some(String::from("")));
+    args.option("",
         "target",
         "Compile target platform, like starcoin",
         "",
@@ -44,6 +50,30 @@ fn parse_args() -> Args {
 
 fn hook_impl(info: &panic::PanicInfo) {
     let _ = println!("{}", info);
+}
+
+fn parse_address_map(address_map: &str)-> Result<(&str, &str), String>{
+    let mut tokens = address_map.split(":");
+
+    match tokens.next() {
+        Some(name) => {
+            match tokens.next() {
+                Some(address) => {
+                    Ok((name, address))
+                }
+                None => {
+                    Err(format!(
+                        "Not found address name in address_map",
+                    ))
+                }
+            }
+        }
+        None => {
+            Err(format!(
+                "Not found address in address_map",
+            ))
+        }
+    }
 }
 
 fn main() -> std::io::Result<()>{
@@ -66,6 +96,16 @@ fn main() -> std::io::Result<()>{
     }
     println!("dependency_dirs: {:?}", dependency_dirs);
     
+    let default_address_map = String::from("");
+    let mut addresse_maps:Vec<(&str, &str)> = vec![];
+    let addresse_maps_text = args.value_of::<String>("address_maps").unwrap_or(default_address_map);
+    if addresse_maps_text != "" {
+        addresse_maps = addresse_maps_text.as_str().split(",").
+            map(|x:&str| parse_address_map(x).unwrap()).
+            collect();
+    }
+
+    println!("address_maps: {:?}", addresse_maps);
 
     let default_target = String::from("starcoin");
     let target = args.value_of::<String>(&"target").unwrap_or(default_target);
@@ -74,7 +114,7 @@ fn main() -> std::io::Result<()>{
     let test_mode = args.value_of::<bool>("test").unwrap_or(false);
     println!("test_mode: {:?}", test_mode);
 
-    move_web::compile_package(&pwd, &install_dir, dependency_dirs, &target, test_mode);
+    move_web::compile_package(&pwd, &install_dir, dependency_dirs, addresse_maps, &target, test_mode);
 
     Ok(())
 }

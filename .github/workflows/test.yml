@@ -13,6 +13,12 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v3
+      - name: setup rust toolchain
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          target: wasm32-wasi
+          components: rustfmt
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:

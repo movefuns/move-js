@@ -42,7 +42,7 @@
     "publish": "npm publish --access=public"
   },
   "author": "yubing744@163.com",
-  "license": "Apache License Version 2.0",
+  "license": "SEE LICENSE IN ./LICENSE",
   "peerDependencies": {
     "rollup": "2.x.x"
   },

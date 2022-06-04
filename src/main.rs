@@ -8,17 +8,11 @@ use getopts::Occur;
 use args::Args;
 
 const PROGRAM_DESC: &'static str = "Run this program";
-const PROGRAM_NAME: &'static str = "program";
+const PROGRAM_NAME: &'static str = "move-web";
 
 fn parse_args() -> Args {
     let mut args = Args::new(PROGRAM_NAME, PROGRAM_DESC);
     args.flag("h", "help", "Print the usage menu");
-    args.option("i",
-        "install_dir",
-        "Installation directory for compiled artifacts. Defaults to current directory",
-        "",
-        Occur::Req,
-        Some(String::from("build")));
     args.option("",
         "dependency_dirs",
         "dependency Directory",
@@ -31,12 +25,6 @@ fn parse_args() -> Args {
         "",
         Occur::Optional,
         Some(String::from("")));
-    args.option("",
-        "target",
-        "Compile target platform, like starcoin",
-        "",
-        Occur::Optional,
-        Some(String::from("starcoin")));
     args.option("",
         "test",
         "Compile in 'test' mode",
@@ -84,10 +72,6 @@ fn main() -> std::io::Result<()>{
 
     let args = parse_args();
 
-    let default_install_dir = String::from("build");
-    let install_dir = args.value_of::<String>(&"install_dir").unwrap_or(default_install_dir);
-    println!("install_dir: {:?}", install_dir);
-
     let default_deps = String::from("");
     let mut dependency_dirs:Vec<&str> = vec![];
     let dependency_dirs_text = args.value_of::<String>(&"dependency_dirs").unwrap_or(default_deps);
@@ -104,17 +88,20 @@ fn main() -> std::io::Result<()>{
             map(|x:&str| parse_address_map(x).unwrap()).
             collect();
     }
-
     println!("address_maps: {:?}", addresse_maps);
-
-    let default_target = String::from("starcoin");
-    let target = args.value_of::<String>(&"target").unwrap_or(default_target);
-    println!("target: {:?}", install_dir);
 
     let test_mode = args.value_of::<bool>("test").unwrap_or(false);
     println!("test_mode: {:?}", test_mode);
 
-    move_web::compile_package(&pwd, &install_dir, dependency_dirs, addresse_maps, &target, test_mode);
+    let ret = move_web::build_package(&pwd,  dependency_dirs, addresse_maps, test_mode);
+    match ret {
+        Ok(()) => {
+            println!("build package ok");
+        },
+        Err(e) => {
+            println!("build package error: {:?}", e);
+        }
+    }
 
     Ok(())
 }

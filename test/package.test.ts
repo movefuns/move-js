@@ -28,6 +28,7 @@ describe("Package", () => {
     expect(mp.devDependencies.get("UnitTest").local).toBe("./unit-test")
   });
 
+  
   it("create my-counter move package from path should be ok", async () => {
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
  
@@ -48,7 +49,7 @@ describe("Package", () => {
   it("build starcoin unit-test package should be ok", async () => {
     await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
  
-    let mp = new MovePackage(wasmfs, "/workspace/unit-test")
+    let mp = new MovePackage(wasmfs, "/workspace/unit-test", true)
     await mp.build()
   });
 
@@ -56,13 +57,14 @@ describe("Package", () => {
   it("build starcoin framework should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
-    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework")
+    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework", false)
     await mp.build()
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/build/NFT.mv")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
 
+  
   it("build my-counter example package should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
@@ -70,9 +72,11 @@ describe("Package", () => {
     let initAlias = new Map<string, string>()
     initAlias.set("StarcoinFramework", "/workspace/starcoin-framework")
 
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", initAlias)
+    let mp = new MovePackage(wasmfs, "/workspace/my-counter", true, initAlias)
     await mp.build()
-  });
 
+    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/release/package.blob")
+    expect(ntfExists).toBeTruthy()
+  });
 
 });

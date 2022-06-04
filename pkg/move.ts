@@ -80,10 +80,10 @@ export class Move implements IMove {
 
     // Output what's inside of /dev/stdout!
     let stdout = await this.wasmFs.getStdOut();
-    console.log('Standard Output: ' + stdout);
+    console.log('Standard Output: \n' + stdout);
 
     let stderr = await this.getStdErr()
-    console.error('Standard Error: ' + stderr);
+    console.error('Standard Error: \n' + stderr);
   }
 
   async getStdErr() {

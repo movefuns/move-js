@@ -10,7 +10,7 @@ const startWasiTask = async (app: HTMLDivElement) => {
     await git.download("/data/starcoin-framework.zip", "/workspace/starcoin-framework")
     await git.download("/data/my-counter.zip", "/workspace/my-counter")
 
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", new Map([
+    let mp = new MovePackage(wasmfs, "/workspace/my-counter", false, new Map([
       ["StarcoinFramework", "/workspace/starcoin-framework"]
     ]))
     

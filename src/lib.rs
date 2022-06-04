@@ -1,34 +1,62 @@
+pub mod types;
+pub mod serde_helper;
+pub mod bcs_ext;
+
 use walkdir::WalkDir;
+
 use move_compiler::Compiler;
-use move_compiler::compiled_unit::CompiledUnit;
+use move_compiler::compiled_unit::{CompiledUnit, NamedCompiledModule};
 use move_compiler::diagnostics::{unwrap_or_report_diagnostics};
 use move_compiler::shared::{Flags, NumericalAddress};
+use move_binary_format::CompiledModule;
 
-use anyhow::{Result};
+use types::script::ScriptFunction;
+use types::module::Module;
+use types::package::Package;
+use anyhow::{Result, Error};
 use std::{
     collections::{BTreeMap},
 };
 
 use std::path::Path;
 
-fn starcoin_framework_named_addresses(address_maps: Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
+fn convert_named_addresses(address_maps: Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
     address_maps
         .iter()
         .map(|(name, addr)| (name.to_string(), NumericalAddress::parse_str(addr).unwrap()))
         .collect()
 }
 
-fn save_under(root_path: &Path, file: &str, bytes: &[u8]) -> Result<()> {
-    let path_to_save = root_path.join(file);
-
-    println!("Module {} saved!", path_to_save.as_path().to_str().unwrap());
-
-    let parent = path_to_save.parent().unwrap();
-    std::fs::create_dir_all(&parent)?;
-    std::fs::write(path_to_save, bytes).map_err(|err| err.into())
+fn module(unit: &CompiledUnit) -> anyhow::Result<&CompiledModule> {
+    match unit {
+        CompiledUnit::Module(NamedCompiledModule { module, .. }) => Ok(module),
+        _ => anyhow::bail!("Found script in modules -- this shouldn't happen"),
+    }
 }
 
-pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>, address_maps: Vec<(&str, &str)>, target: &str, test_mode: bool) {
+fn save_package(root_dir: &Path, modules:Vec<Module>, init_script: Option<ScriptFunction>) -> Result<(), Error> {
+    let mut release_dir = root_dir.join("release");
+
+    let p = Package::new(modules, init_script)?;
+    let blob = bcs_ext::to_bytes(&p)?;
+    let release_path = {
+        std::fs::create_dir_all(&release_dir)?;
+        release_dir.push(format!(
+            "{}.blob",
+            "package"
+        ));
+        release_dir
+    };
+    std::fs::write(&release_path, blob)?;
+    println!(
+        "build done, saved: {}",
+        release_path.display()
+    );
+
+    Ok(())
+}
+
+pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(&str, &str)>, test_mode: bool) -> Result<(), Error>  {
     let mut targets: Vec<String> = vec![];
     let mut deps: Vec<String> = vec![];
 
@@ -36,31 +64,38 @@ pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>
     let sources_dir = path.join("sources");
 
     for entry in WalkDir::new(sources_dir) {
-        let entry_ref = entry.as_ref();
+        let entry_raw = entry?;
 
-        if entry_ref.unwrap().path().is_file() {
-            let move_file_path = entry_ref.unwrap().path().to_str().unwrap().to_owned();
-            targets.push(move_file_path);
+        if entry_raw.path().is_file() {
+            let move_file_path = entry_raw.path().to_str();
+            match move_file_path {
+                Some(f) => {
+                    targets.push(f.to_string());
+                },
+                _ => {}
+            }
+            
         }
     }
-
 
     for dep_dir in dep_dirs {
         let dep_path = Path::new(dep_dir);
         let dep_sources_dir = dep_path.join("sources");
 
         for entry in WalkDir::new(dep_sources_dir) {
-            let entry_ref = entry.as_ref();
+            let entry_raw = entry?;
     
-            if entry_ref.unwrap().path().is_file() {
-                let move_file_path = entry_ref.unwrap().path().to_str().unwrap().to_owned();
-                deps.push(move_file_path);
+            if entry_raw.path().is_file() {
+                let move_file_path = entry_raw.path().to_str();
+                match move_file_path {
+                    Some(f) => {
+                        deps.push(f.to_string());
+                    },
+                    _ => {}
+                }
             }
         }
     }
-    
-    println!("compile targets: {:?}", targets);
-    println!("compile deps: {:?}", deps);
 
     let mut flags = Flags::empty()
         .set_sources_shadow_deps(true);
@@ -70,10 +105,10 @@ pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>
     }
 
     let c = Compiler::new(&targets, &deps)
-        .set_named_address_values(starcoin_framework_named_addresses(address_maps))
+        .set_named_address_values(convert_named_addresses(address_maps))
         .set_flags(flags);
 
-    let (source_text, compiled_result) = c.build().expect("build fail");
+    let (source_text, compiled_result) = c.build()?;
 
     let compiled_units = unwrap_or_report_diagnostics(&source_text, compiled_result);
 
@@ -85,17 +120,20 @@ pub fn compile_package(package_path: &str, install_dir: &str, dep_dirs:Vec<&str>
 
     let root_path = Path::new(&package_path);
 
+    let mut modules = vec![];
     
-    let install_path = root_path.join(&install_dir);
-
     for mv in mv_units {
-        let symbol = mv.name();
-        let name = symbol.as_ref();
+        let m = module(&mv)?;
+        let code = {
+            let mut data = vec![];
+            m.serialize(&mut data)?;
+            data
+        };
 
-        let file_name = format!("{}.mv", name);
-        let bytes = mv.serialize_debug();
-        _ = save_under(install_path.as_path(), &file_name, &bytes);
+        modules.push(Module::new(code));
     }
 
-    println!("compile ok!");
+    save_package(root_path, modules, None)?;
+
+    Ok(())
 }

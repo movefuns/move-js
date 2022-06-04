@@ -18,7 +18,7 @@ jobs:
         with:
           toolchain: nightly
           target: wasm32-wasi
-          components: rustfmt
+          components: rustfmt,rust-src,clippy
       - name: Install Node.js
         uses: actions/setup-node@v3
         with:

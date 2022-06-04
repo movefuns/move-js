@@ -20,10 +20,10 @@ describe("Move", () => {
 
     await cli.run(["--address_maps", "Std:0x1", "--test", "true"])
 
-    const unitTestExists = wasmfs.fs.existsSync("/workspace/unit-test/release/package.blob")
+    const unitTestExists = wasmfs.fs.existsSync("/workspace/unit-test/target/starcoin/release/package.blob")
     expect(unitTestExists).toBeTruthy()
   });
-   
+ 
   it("run build starcoin-framework should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
@@ -33,7 +33,7 @@ describe("Move", () => {
     
     await cli.run(["--dependency_dirs", "/workspace/starcoin-framework/unit-test", "--address_maps", "StarcoinFramework:0x1,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1"])
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
  
@@ -49,7 +49,8 @@ describe("Move", () => {
     
     await cli.run(["--dependency_dirs", "/workspace/starcoin-framework,/workspace/starcoin-framework/unit-test", "--address_maps", "StarcoinFramework:0x1,MyCounter:0xABCDE,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1"])
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
+
 });

@@ -16,9 +16,13 @@ const startWasiTask = async (app: HTMLDivElement) => {
     
     await mp.build()
 
+    let blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
+    let base64Data = blobBuf.toString("base64")
+    console.log("my-counter blob:", base64Data)
+
     app.innerHTML = `
-      <h1>Hello Vite!</h1>
-      <a href="https://vitejs.dev/guide/features.html" target="_blank">Documentation</a>
+      <h1>my-counter blob:</h1>
+      ${base64Data}
     `
 }
 

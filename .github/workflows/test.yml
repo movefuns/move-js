@@ -1,0 +1,27 @@
+on:
+  push:
+    branches: [ 'master', 'release-**' ]
+  pull_request:
+    branches: [ 'master', 'release-**' ]
+name: Test
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-10.15, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        run: yarn install
+      - name: Run headless test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: yarn test
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

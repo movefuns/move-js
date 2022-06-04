@@ -38,6 +38,7 @@
     "lint:js": "prettier --write pkg/**/*.js",
     "lint:ts:tslint": "tslint --project tsconfig.json -t codeFrame 'pkg/**/*.ts'",
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
+    "lint:rust": "cargo fmt",
     "clean": "rimraf dist && rimraf pkg/*.wasm",
     "publish": "npm publish --access=public"
   },

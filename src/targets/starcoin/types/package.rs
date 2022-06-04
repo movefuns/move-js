@@ -1,19 +1,16 @@
 use anyhow::{ensure, Result};
 
-use schemars::JsonSchema;
-use serde::{Deserialize, Serialize};
+use move_binary_format::access::ModuleAccess;
 use move_binary_format::errors::Location;
 use move_binary_format::CompiledModule;
-use move_binary_format::access::ModuleAccess;
 use move_core_types::account_address::AccountAddress;
+use schemars::JsonSchema;
+use serde::{Deserialize, Serialize};
 
 use crate::targets::starcoin::types::module::Module;
 use crate::targets::starcoin::types::script::ScriptFunction;
 
-
-#[derive(
-    Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema,
-)]
+#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct Package {
     ///Package's all Module must at same address.
     #[schemars(with = "String")]
@@ -55,7 +52,7 @@ impl Package {
     pub fn set_init_script(&mut self, script: ScriptFunction) {
         self.init_script = Some(script);
     }
-    
+
     pub fn add_module(&mut self, module: Module) -> Result<()> {
         self.modules.push(module);
         Ok(())

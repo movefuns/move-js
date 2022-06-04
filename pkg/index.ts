@@ -1,9 +1,5 @@
-import { Git } from "./git";
-import { Move } from "./move";
-import { MovePackage } from "./package";
+import { Git } from './git'
+import { Move } from './move'
+import { MovePackage } from './package'
 
-export {
-    Git,
-    Move,
-    MovePackage
-};
+export { Git, Move, MovePackage }

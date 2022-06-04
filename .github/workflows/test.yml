@@ -27,6 +27,13 @@ jobs:
           node-version: '14.x'
       - name: Install dependencies
         run: yarn install
+      - name: run fmt check
+        uses: actions-rs/cargo@v1
+        with:
+          command: fmt
+          args: -- --check
+      - name: Run tslint check
+        run: yarn lint:ts:tslint
       - name: Run headless test
         uses: GabrielBB/xvfb-action@v1
         with:

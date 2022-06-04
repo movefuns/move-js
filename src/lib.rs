@@ -1,18 +1,14 @@
-pub mod types;
-pub mod serde_helper;
-pub mod bcs_ext;
+pub mod utils;
+pub mod targets;
 
 use walkdir::WalkDir;
 
 use move_compiler::Compiler;
-use move_compiler::compiled_unit::{CompiledUnit, NamedCompiledModule};
+use move_compiler::compiled_unit::CompiledUnit;
 use move_compiler::diagnostics::{unwrap_or_report_diagnostics};
 use move_compiler::shared::{Flags, NumericalAddress};
-use move_binary_format::CompiledModule;
+use targets::target::TargetType;
 
-use types::script::ScriptFunction;
-use types::module::Module;
-use types::package::Package;
 use anyhow::{Result, Error};
 use std::{
     collections::{BTreeMap},
@@ -20,45 +16,17 @@ use std::{
 
 use std::path::Path;
 
-fn convert_named_addresses(address_maps: Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
+fn convert_named_addresses(address_maps: &Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
     address_maps
         .iter()
         .map(|(name, addr)| (name.to_string(), NumericalAddress::parse_str(addr).unwrap()))
         .collect()
 }
 
-fn module(unit: &CompiledUnit) -> anyhow::Result<&CompiledModule> {
-    match unit {
-        CompiledUnit::Module(NamedCompiledModule { module, .. }) => Ok(module),
-        _ => anyhow::bail!("Found script in modules -- this shouldn't happen"),
-    }
-}
-
-fn save_package(root_dir: &Path, modules:Vec<Module>, init_script: Option<ScriptFunction>) -> Result<(), Error> {
-    let mut release_dir = root_dir.join("release");
-
-    let p = Package::new(modules, init_script)?;
-    let blob = bcs_ext::to_bytes(&p)?;
-    let release_path = {
-        std::fs::create_dir_all(&release_dir)?;
-        release_dir.push(format!(
-            "{}.blob",
-            "package"
-        ));
-        release_dir
-    };
-    std::fs::write(&release_path, blob)?;
-    println!(
-        "build done, saved: {}",
-        release_path.display()
-    );
-
-    Ok(())
-}
-
-pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(&str, &str)>, test_mode: bool) -> Result<(), Error>  {
-    let mut targets: Vec<String> = vec![];
+pub fn build_package(package_path: &str, dep_dirs:&Vec<&str>, address_maps: &Vec<(&str, &str)>, target_types: &Vec<&str>, test_mode: bool) -> Result<(), Error>  {
+    let mut sources: Vec<String> = vec![];
     let mut deps: Vec<String> = vec![];
+    let mut targets: Vec<TargetType> = vec![];
 
     let path = Path::new(&package_path);
     let sources_dir = path.join("sources");
@@ -70,7 +38,7 @@ pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(
             let move_file_path = entry_raw.path().to_str();
             match move_file_path {
                 Some(f) => {
-                    targets.push(f.to_string());
+                    sources.push(f.to_string());
                 },
                 _ => {}
             }
@@ -97,6 +65,11 @@ pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(
         }
     }
 
+    for target_type in target_types {
+        let target = TargetType::from((*target_type).to_string());
+        targets.push(target);
+    }
+
     let mut flags = Flags::empty()
         .set_sources_shadow_deps(true);
     if test_mode {
@@ -104,7 +77,7 @@ pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(
             .set_sources_shadow_deps(true);
     }
 
-    let c = Compiler::new(&targets, &deps)
+    let c = Compiler::new(&sources, &deps)
         .set_named_address_values(convert_named_addresses(address_maps))
         .set_flags(flags);
 
@@ -112,28 +85,13 @@ pub fn build_package(package_path: &str, dep_dirs:Vec<&str>, address_maps: Vec<(
 
     let compiled_units = unwrap_or_report_diagnostics(&source_text, compiled_result);
 
-    let mv_units:Vec<CompiledUnit> = compiled_units
+    let units:Vec<CompiledUnit> = compiled_units
         .0
         .into_iter()
         .map(|c| c.into_compiled_unit())
         .collect();
 
+    // Output compile targets
     let root_path = Path::new(&package_path);
-
-    let mut modules = vec![];
-    
-    for mv in mv_units {
-        let m = module(&mv)?;
-        let code = {
-            let mut data = vec![];
-            m.serialize(&mut data)?;
-            data
-        };
-
-        modules.push(Module::new(code));
-    }
-
-    save_package(root_path, modules, None)?;
-
-    Ok(())
+    targets::target::output(&units, &targets, root_path)
 }

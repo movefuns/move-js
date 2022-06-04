@@ -23,6 +23,10 @@ const startWasiTask = async () => {
     ]))
     
     await mp.build()
+
+    let blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
+    let base64Data = blobBuf.toString("base64")
+    console.log("my-counter blob:", base64Data)
 }
 
 startWasiTask()

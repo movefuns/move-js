@@ -11,11 +11,10 @@ describe("Package", () => {
     git = new Git(wasmfs);
   });
 
-  /*
   it("create starcoin framework move package from path should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
-    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework")
+    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework", false)
     expect(mp.name).toBe("StarcoinFramework")
     expect(mp.version).toBe("0.1.0")
 
@@ -32,7 +31,7 @@ describe("Package", () => {
   it("create my-counter move package from path should be ok", async () => {
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
  
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter")
+    let mp = new MovePackage(wasmfs, "/workspace/my-counter", false)
     expect(mp.name).toBe("my_counter")
     expect(mp.version).toBe("0.0.1")
 
@@ -44,7 +43,6 @@ describe("Package", () => {
     expect(mp.dependencies.get("StarcoinFramework").git).toBe("https://github.com/starcoinorg/starcoin-framework.git")
     expect(mp.dependencies.get("StarcoinFramework").rev).toBe("cf1deda180af40a8b3e26c0c7b548c4c290cd7e7")
   });
-  */
  
   it("build starcoin unit-test package should be ok", async () => {
     await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
@@ -60,7 +58,7 @@ describe("Package", () => {
     let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework", false)
     await mp.build()
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
 
@@ -75,7 +73,7 @@ describe("Package", () => {
     let mp = new MovePackage(wasmfs, "/workspace/my-counter", true, initAlias)
     await mp.build()
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
 

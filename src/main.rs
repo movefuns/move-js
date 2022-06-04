@@ -25,6 +25,12 @@ fn parse_args() -> Args {
         "",
         Occur::Optional,
         Some(String::from("")));
+    args.option("t",
+        "targets",
+        "target chain",
+        "",
+        Occur::Optional,
+        Some(String::from("")));
     args.option("",
         "test",
         "Compile in 'test' mode",
@@ -90,10 +96,18 @@ fn main() -> std::io::Result<()>{
     }
     println!("address_maps: {:?}", addresse_maps);
 
+    let default_targets = String::from("starcoin");
+    let mut targets:Vec<&str> = vec![];
+    let targets_text = args.value_of::<String>(&"targets").unwrap_or(default_targets);
+    if targets_text != "" {
+        targets = targets_text.as_str().split(",").collect();
+    }
+    println!("targets: {:?}", targets);
+
     let test_mode = args.value_of::<bool>("test").unwrap_or(false);
     println!("test_mode: {:?}", test_mode);
 
-    let ret = move_web::build_package(&pwd,  dependency_dirs, addresse_maps, test_mode);
+    let ret = move_web::build_package(&pwd,  &dependency_dirs, &addresse_maps, &targets, test_mode);
     match ret {
         Ok(()) => {
             println!("build package ok");

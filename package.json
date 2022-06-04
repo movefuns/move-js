@@ -1,6 +1,6 @@
 {
   "name": "@yubing744/move-js",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
     "move",

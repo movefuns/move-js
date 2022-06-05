@@ -19,6 +19,13 @@ export interface IMovePackage {
   build(): void
 }
 
+export type MoveOptions = {
+  packagePath: string,
+  test: boolean,
+  alias?: Map<string, string>
+  initFunction?: string
+};
+
 export class MovePackage implements IMovePackage {
   public name?: string
   public version?: string
@@ -30,29 +37,29 @@ export class MovePackage implements IMovePackage {
   private packagePath: string
   private packageAlias: Map<string, string>
   private test: boolean
+  private initFunction?: string
 
   constructor(
     wasmfs: WasmFs,
-    packagePath: string,
-    test: boolean,
-    alias?: Map<string, string>
+    opts: MoveOptions
   ) {
     this.wasmfs = wasmfs
-    this.packagePath = packagePath
+    this.packagePath = opts.packagePath
 
-    const tomlPath = path.join(packagePath, 'Move.toml')
+    const tomlPath = path.join(opts.packagePath, 'Move.toml')
     const tomlContent = wasmfs.fs.readFileSync(tomlPath, 'utf-8')
     this.parseToml(tomlContent.toString())
 
     const packageAlias = new Map<string, string>()
-    if (alias != null) {
-      alias.forEach((val: string, key: string) => {
+    if (opts.alias != null) {
+      opts.alias.forEach((val: string, key: string) => {
         packageAlias.set(key, val)
       })
     }
 
     this.packageAlias = packageAlias
-    this.test = test
+    this.test = opts.test
+    this.initFunction = opts.initFunction
   }
 
   parseToml(tomlContent: string): void {
@@ -131,8 +138,10 @@ export class MovePackage implements IMovePackage {
         if (aliasPath != null) {
           allDeps.push(aliasPath)
 
-          new MovePackage(this.wasmfs, aliasPath, false)
-            .getAllDeps()
+          new MovePackage(this.wasmfs, {
+            packagePath: aliasPath, 
+            test: false
+          }).getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -144,8 +153,10 @@ export class MovePackage implements IMovePackage {
           const depPath = path.join(this.packagePath, dep.local)
           allDeps.push(depPath)
 
-          new MovePackage(this.wasmfs, depPath, false)
-            .getAllDeps()
+          new MovePackage(this.wasmfs, {
+            packagePath: depPath, 
+            test: false
+          }).getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -178,7 +189,10 @@ export class MovePackage implements IMovePackage {
         const aliasPath = packageAlias.get(key)
 
         if (aliasPath != null) {
-          const mp = new MovePackage(this.wasmfs, aliasPath, false)
+          const mp = new MovePackage(this.wasmfs, {
+            packagePath: aliasPath,
+            test: false,
+          })
           const addresses = mp.getAllAddresses()
           if (addresses) {
             addresses.forEach((addr: string, name: string) => {
@@ -191,7 +205,11 @@ export class MovePackage implements IMovePackage {
 
         if (dep.local) {
           const depPath = path.join(this.packagePath, dep.local)
-          const mp = new MovePackage(this.wasmfs, depPath, false)
+          const mp = new MovePackage(this.wasmfs, {
+            packagePath: depPath,
+            test: false,
+          })
+
           const addresses = mp.getAllAddresses()
           if (addresses) {
             addresses.forEach((addr: string, name: string) => {
@@ -207,7 +225,7 @@ export class MovePackage implements IMovePackage {
     wasmfs: WasmFs,
     packagePath: string,
     deps: string[],
-    addresses: Map<string, string>
+    addresses: Map<string, string>,
   ): Promise<void> {
     console.log('Building ', this.name)
 
@@ -223,9 +241,15 @@ export class MovePackage implements IMovePackage {
     })
     const addressArgs = addressMaps.join(',')
 
+    let initFunction = ""
+    if (this.initFunction) {
+      initFunction = this.initFunction
+    }
+
     console.log('build deps:', depDirs)
     console.log('build addresses:', addressArgs)
     console.log('is test:', this.test)
+    console.log('initFunction:', initFunction)
 
     await cli.run([
       '--dependency_dirs',
@@ -234,6 +258,8 @@ export class MovePackage implements IMovePackage {
       addressArgs,
       '--test',
       String(this.test),
+      '--init_function',
+      initFunction,
     ])
   }
 }

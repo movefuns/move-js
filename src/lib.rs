@@ -27,6 +27,7 @@ pub fn build_package(
     address_maps: &Vec<(&str, &str)>,
     target_types: &Vec<&str>,
     test_mode: bool,
+    init_function: &str,
 ) -> Result<(), Error> {
     let mut sources: Vec<String> = vec![];
     let mut deps: Vec<String> = vec![];
@@ -94,5 +95,5 @@ pub fn build_package(
 
     // Output compile targets
     let root_path = Path::new(&package_path);
-    targets::target::output(&units, &targets, root_path)
+    targets::target::output(&units, &targets, root_path, init_function)
 }

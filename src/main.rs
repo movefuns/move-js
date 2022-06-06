@@ -44,6 +44,14 @@ fn parse_args() -> Args {
         Occur::Optional,
         Some(String::from("false")),
     );
+    args.option(
+        "i",
+        "init_function",
+        " init script function to execute, example: 0x123::MyScripts::init_scr",
+        "",
+        Occur::Optional,
+        Some(String::from("")),
+    );
 
     args.parse(env::args()).expect("no error when parse");
     args
@@ -110,7 +118,11 @@ fn main() -> std::io::Result<()> {
     let test_mode = args.value_of::<bool>("test").unwrap_or(false);
     println!("test_mode: {:?}", test_mode);
 
-    let ret = move_web::build_package(&pwd, &dependency_dirs, &addresse_maps, &targets, test_mode);
+    let default_init_func = String::from("");
+    let init_function = args.value_of::<String>("init_function").unwrap_or(default_init_func);
+    println!("init_function: {:?}", init_function);
+
+    let ret = move_web::build_package(&pwd, &dependency_dirs, &addresse_maps, &targets, test_mode, init_function.as_str());
     match ret {
         Ok(()) => {
             println!("build package ok");

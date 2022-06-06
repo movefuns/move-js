@@ -47,7 +47,9 @@ describe("Move", () => {
         preopens: ["/workspace"]
     })
     
-    await cli.run(["--dependency_dirs", "/workspace/starcoin-framework,/workspace/starcoin-framework/unit-test", "--address_maps", "StarcoinFramework:0x1,MyCounter:0xABCDE,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1"])
+    await cli.run(["--dependency_dirs", "/workspace/starcoin-framework,/workspace/starcoin-framework/unit-test", 
+      "--address_maps", "StarcoinFramework:0x1,MyCounter:0xABCDE,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1",
+      "--init_function", "0xABCDE::MyCounter::init"])
 
     const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()

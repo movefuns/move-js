@@ -2,16 +2,6 @@ import { WasmFs } from '@wasmer/wasmfs'
 import * as zip from '@zip.js/zip.js'
 import * as path from 'path'
 
-/**
- * Git repo interface
- */
-export interface IRepo {
-  type: string
-  origin: string
-  owner: string
-  name: string
-  checkout: string
-}
 
 /**
  * Git interface

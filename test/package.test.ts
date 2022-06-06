@@ -14,7 +14,11 @@ describe("Package", () => {
   it("create starcoin framework move package from path should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
-    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework", false)
+    let mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/starcoin-framework", 
+      test: false
+    })
+
     expect(mp.name).toBe("StarcoinFramework")
     expect(mp.version).toBe("0.1.0")
 
@@ -31,7 +35,11 @@ describe("Package", () => {
   it("create my-counter move package from path should be ok", async () => {
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
  
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", false)
+    let mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/my-counter", 
+      test: false
+    })
+
     expect(mp.name).toBe("my_counter")
     expect(mp.version).toBe("0.0.1")
 
@@ -47,7 +55,10 @@ describe("Package", () => {
   it("build starcoin unit-test package should be ok", async () => {
     await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
  
-    let mp = new MovePackage(wasmfs, "/workspace/unit-test", true)
+    let mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/unit-test", 
+      test: true
+    })
     await mp.build()
   });
 
@@ -55,7 +66,11 @@ describe("Package", () => {
   it("build starcoin framework should be ok", async () => {
     await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
  
-    let mp = new MovePackage(wasmfs, "/workspace/starcoin-framework", false)
+    let mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/starcoin-framework", 
+      test: false
+    })
+
     await mp.build()
 
     const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/target/starcoin/release/package.blob")
@@ -70,7 +85,13 @@ describe("Package", () => {
     let initAlias = new Map<string, string>()
     initAlias.set("StarcoinFramework", "/workspace/starcoin-framework")
 
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", true, initAlias)
+    let mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/my-counter", 
+      test: true,
+      alias: initAlias,
+      initFunction: "0xABCDE::MyCounter::init"
+    })
+    
     await mp.build()
 
     const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")

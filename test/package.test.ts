@@ -88,7 +88,8 @@ describe("Package", () => {
     let mp = new MovePackage(wasmfs, {
       packagePath: "/workspace/my-counter", 
       test: true,
-      alias: initAlias
+      alias: initAlias,
+      initFunction: "0xABCDE::MyCounter::init"
     })
     
     await mp.build()

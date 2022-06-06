@@ -4,20 +4,25 @@ import { WasmFs } from '@wasmer/wasmfs'
 import { Git, MovePackage } from '@yubing744/move-js'
 
 const startWasiTask = async (app: HTMLDivElement) => {
-    let wasmfs = new WasmFs()
-    let git = new Git(wasmfs)
+    const wasmfs = new WasmFs()
+    const git = new Git(wasmfs)
 
     await git.download("/data/starcoin-framework.zip", "/workspace/starcoin-framework")
     await git.download("/data/my-counter.zip", "/workspace/my-counter")
 
-    let mp = new MovePackage(wasmfs, "/workspace/my-counter", false, new Map([
-      ["StarcoinFramework", "/workspace/starcoin-framework"]
-    ]))
+    const mp = new MovePackage(wasmfs, {
+      packagePath: "/workspace/my-counter",
+      test: false,
+      alias: new Map([
+        ["StarcoinFramework", "/workspace/starcoin-framework"]
+      ]),
+      initFunction: "0xABCDE::MyCounter::init"
+    })
     
     await mp.build()
 
-    let blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
-    let base64Data = blobBuf.toString("base64")
+    const blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
+    const base64Data = blobBuf.toString("base64")
     console.log("my-counter blob:", base64Data)
 
     app.innerHTML = `

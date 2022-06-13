@@ -9,7 +9,7 @@ Javascript version of the move language compiler, supports compiling Move code i
 
 ```ts
 import { WasmFs } from '@wasmer/wasmfs'
-import { Git, MovePackage } from '@yubing744/move-js'
+import { Git, MovePackage } from '@starcoin/move-js'
 
 const startWasiTask = async () => {
     const wasmfs = new WasmFs()

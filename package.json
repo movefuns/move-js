@@ -1,6 +1,6 @@
 {
-  "name": "@yubing744/move-js",
-  "version": "0.5.0",
+  "name": "@starcoin/move-js",
+  "version": "0.6.1",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
     "move",
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/yubing744/move-js"
+    "url": "https://github.com/starcoinorg/move-js"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -39,9 +39,9 @@
     "lint:ts:preetier": "prettier --write pkg/**/*.ts",
     "lint:rust": "cargo fmt",
     "clean": "rimraf dist && rimraf pkg/*.wasm",
-    "publish": "npm publish --access=public"
+    "release": "npm publish --access public --tag latest"
   },
-  "author": "yubing744@163.com",
+  "author": "starcoinorg",
   "license": "SEE LICENSE IN ./LICENSE",
   "peerDependencies": {
     "rollup": "2.x.x"

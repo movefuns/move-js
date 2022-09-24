@@ -2,6 +2,14 @@ use std::env;
 use std::panic;
 
 use clap::Parser;
+use move_binary_format::{
+    binary_views::BinaryIndexedView,
+    file_format::{CompiledModule, CompiledScript},
+};
+use move_bytecode_source_map::mapping::SourceMapping;
+use move_disassembler::disassembler::{Disassembler, DisassemblerOptions};
+use move_ir_types::location::Spanned;
+
 use move_web::cli::{CliOptions, Commands};
 
 fn hook_impl(info: &panic::PanicInfo) {
@@ -82,8 +90,55 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        Commands::Disassemble { codes: _ } => {
-            println!("hello, dissassemble");
+        Commands::Disassemble {
+            skip_private,
+            skip_code,
+            skip_locals,
+            skip_basic_blocks,
+            is_script,
+            bytecode,
+        } => {
+            let bytecode_bytes = hex::decode(bytecode).unwrap();
+
+            let mut disassembler_options = DisassemblerOptions::new();
+            disassembler_options.print_code = !skip_code;
+            disassembler_options.only_externally_visible = !skip_private;
+            disassembler_options.print_basic_blocks = !skip_basic_blocks;
+            disassembler_options.print_locals = !skip_locals;
+
+            let no_loc = Spanned::unsafe_no_loc(()).loc;
+            let module: CompiledModule;
+            let script: CompiledScript;
+            let bytecode = if is_script {
+                script = CompiledScript::deserialize(&bytecode_bytes)
+                    .expect("Script blob can't be deserialized");
+                BinaryIndexedView::Script(&script)
+            } else {
+                module = CompiledModule::deserialize(&bytecode_bytes)
+                    .expect("Module blob can't be deserialized");
+                BinaryIndexedView::Module(&module)
+            };
+
+            let source_mapping = SourceMapping::new_from_view(bytecode, no_loc)
+                .expect("Unable to build dummy source mapping");
+
+            let disassembler = Disassembler::new(source_mapping, disassembler_options);
+
+            match disassembler.disassemble() {
+                Ok(v) => {
+                    println!("ok");
+                    println!("{}", v);
+                }
+                Err(e) => {
+                    println!("err");
+                    println!("{}", e);
+                }
+            }
+
+            // let dissassemble_string = disassembler.disassemble().expect("Unable to dissassemble");
+            //
+            //
+            // println!("hello, dissassemble {}", dissassemble_string);
         }
     }
 

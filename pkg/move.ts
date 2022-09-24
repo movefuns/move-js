@@ -4,7 +4,7 @@ import { WasmFs } from '@wasmer/wasmfs'
 import loadMoveWasmModule from './move_bg'
 
 export interface IMove {
-  run(args?: string[]): Promise<void>
+  run(args?: string[]): Promise<any>
 }
 
 export interface IMoveOption {
@@ -28,7 +28,7 @@ export class Move implements IMove {
     }
   }
 
-  async run(args?: string[]): Promise<void> {
+  async run(args?: string[]): Promise<any> {
     const opts = this.opts
 
     const preopens: WASIPreopenedDirs = {}
@@ -84,6 +84,8 @@ export class Move implements IMove {
 
     const stderr = await this.getStdErr()
     console.error('Standard Error: \n' + stderr)
+
+    return stdout;
   }
 
   async getStdErr() {

@@ -1,6 +1,6 @@
+pub mod cli;
 pub mod targets;
 pub mod utils;
-pub mod cli;
 
 use walkdir::WalkDir;
 

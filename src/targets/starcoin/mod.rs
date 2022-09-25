@@ -7,10 +7,10 @@ use crate::targets::target::Target;
 use crate::utils::bcs_ext;
 use anyhow::{Error, Result};
 use std::path::Path;
+use types::function::FunctionId;
 use types::module::Module;
 use types::package::Package;
 use types::script::ScriptFunction;
-use types::function::FunctionId;
 
 pub struct StarcoinTarget {}
 
@@ -21,7 +21,12 @@ impl StarcoinTarget {
 }
 
 impl Target for StarcoinTarget {
-    fn output(self, units: &Vec<CompiledUnit>, dest_path: &Path, init_function: &str) -> Result<()> {
+    fn output(
+        self,
+        units: &Vec<CompiledUnit>,
+        dest_path: &Path,
+        init_function: &str,
+    ) -> Result<()> {
         let mut modules = vec![];
 
         for mv in units {

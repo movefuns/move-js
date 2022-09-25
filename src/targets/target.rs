@@ -3,7 +3,12 @@ use move_compiler::compiled_unit::CompiledUnit;
 use std::path::Path;
 
 pub trait Target {
-    fn output(self, units: &Vec<CompiledUnit>, dest_path: &Path, init_function: &str) -> anyhow::Result<()>;
+    fn output(
+        self,
+        units: &Vec<CompiledUnit>,
+        dest_path: &Path,
+        init_function: &str,
+    ) -> anyhow::Result<()>;
 }
 
 pub enum TargetType {
@@ -33,7 +38,7 @@ pub fn output(
     units: &Vec<CompiledUnit>,
     target_types: &Vec<TargetType>,
     root_path: &Path,
-    init_function: &str
+    init_function: &str,
 ) -> anyhow::Result<()> {
     let root_dir = root_path.join("target");
 

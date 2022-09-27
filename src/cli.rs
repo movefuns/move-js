@@ -27,31 +27,52 @@ pub enum Commands {
         init_function: Option<String>,
     },
     #[clap(name = "disassemble")]
-    Disassemble {
-        /// Skip printing of private functions.
-        #[clap(long = "skip-private")]
-        skip_private: bool,
+    Disassemble(DisassembleArgs),
+}
 
-        /// Do not print the disassembled bytecodes of each function.
-        #[clap(long = "skip-code")]
-        skip_code: bool,
+// #[derive(Parser)]
+// pub struct BuildArgs {
+//     #[clap(long = "dependency_dirs")]
+//     pub dependency_dirs: Option<String>,
 
-        /// Do not print locals of each function.
-        #[clap(long = "skip-locals")]
-        skip_locals: bool,
+//     #[clap(long = "address_maps")]
+//     pub address_maps: Option<String>,
 
-        /// Do not print the basic blocks of each function.
-        #[clap(long = "skip-basic-blocks")]
-        skip_basic_blocks: bool,
+//     #[clap(long = "targets", short = 't')]
+//     pub targets: Option<String>,
 
-        /// Treat input file as a script (default is to treat file as a module)
-        #[clap(short = 's', long = "script")]
-        is_script: bool,
+//     #[clap(long = "test")]
+//     pub test: Option<bool>,
 
-        /// The path to the bytecode file to disassemble; let's call it file.mv. We assume that two
-        /// other files reside under the same directory: a source map file.mvsm (possibly) and the Move
-        /// source code file.move.
-        #[clap(short = 'b', long = "bytecode")]
-        bytecode: String,
-    },
+//     #[clap(long = "init_function", short = 'i')]
+//     pub init_function: Option<String>,
+// }
+
+#[derive(Parser)]
+pub struct DisassembleArgs {
+    /// Skip printing of private functions.
+    #[clap(long = "skip-private")]
+    pub skip_private: bool,
+
+    /// Do not print the disassembled bytecodes of each function.
+    #[clap(long = "skip-code")]
+    pub skip_code: bool,
+
+    /// Do not print locals of each function.
+    #[clap(long = "skip-locals")]
+    pub skip_locals: bool,
+
+    /// Do not print the basic blocks of each function.
+    #[clap(long = "skip-basic-blocks")]
+    pub skip_basic_blocks: bool,
+
+    /// Treat input file as a script (default is to treat file as a module)
+    #[clap(short = 's', long = "script")]
+    pub is_script: bool,
+
+    /// The path to the bytecode file to disassemble; let's call it file.mv. We assume that two
+    /// other files reside under the same directory: a source map file.mvsm (possibly) and the Move
+    /// source code file.move.
+    #[clap(short = 'b', long = "file_path")]
+    pub filePath: String,
 }

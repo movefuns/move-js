@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as TOML from '@iarna/toml'
-import { WasmFs } from '@wasmer/wasmfs'
+import lib, { WasmFs } from '@wasmer/wasmfs'
 import { Move } from '../pkg/move'
 
 export interface IDependency {
@@ -19,12 +19,49 @@ export interface IMovePackage {
   build(): void
 }
 
+export interface IDisassemblePackage {
+  disassemble(name: string, bytecode: string, callback: (ok: boolean, data: string) => void): Promise<void>
+}
+
 export type MoveOptions = {
   packagePath: string,
   test: boolean,
   alias?: Map<string, string>
   initFunction?: string
 };
+
+export class DisassemblePackage implements IDisassemblePackage {
+  private wasmfs: WasmFs
+
+  constructor(
+    wasmfs: WasmFs,
+  ) {
+    this.wasmfs = wasmfs
+  }
+
+  public async disassemble(name: string, bytecode: string, callback: (ok: boolean, data: string) => void): Promise<void> {
+    const root = "/workspace/disassemble/"
+    this.wasmfs.fs.mkdirpSync(root)
+
+    const codePath = root + name
+    this.wasmfs.fs.writeFileSync(codePath, bytecode)
+
+    const cli = new Move(this.wasmfs, {
+      pwd: "/workspace/disassemble/",
+      preopens: ['/workspace'],
+    })
+
+    await cli.run(["--", "disassemble", "--file_path", codePath])
+
+    const ntfExists = this.wasmfs.fs.existsSync(codePath + ".d")
+
+    if (ntfExists) {
+      await this.wasmfs.fs.readFile(codePath + ".d", (_, v) => callback(true, v?.toString()))
+    } else {
+      await this.wasmfs.fs.readFile(codePath + ".e", (_, v) => callback(false, v?.toString()))
+    }
+  }
+}
 
 export class MovePackage implements IMovePackage {
   public name?: string

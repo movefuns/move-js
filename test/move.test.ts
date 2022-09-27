@@ -57,15 +57,28 @@ describe("Move", () => {
 
   it("run disassemble should be ok", async () => {
 
-    let cli = new Move(wasmfs)
+    await git.download("./base/test/data/disassemble.zip", "/workspace/disassemble")
 
-    let bytecode = "a11ceb0b040000000901000402040403081905210c072d4e087b200a9b01050ca001510df101020000010100020c000003000100000402010000050001000006020100010800040001060c00010c010708000105094d79436f756e746572065369676e657207436f756e74657204696e63720c696e63725f636f756e74657204696e69740c696e69745f636f756e7465720576616c75650a616464726573735f6f66ddb608357d749031bbdb79c21db535950000000000000000000000000000000100020107030001000100030d0b0011042a000c010a01100014060100000000000000160b010f001502010200010001030e001100020201000001050b0006000000000000000012002d00020302000001030e00110202000000"
+    let cli = new Move(wasmfs, {
+      pwd: "/workspace/disassemble",
+      preopens: ["/workspace"]
+    })
 
-    let s = await cli.run(["--", "disassemble", "--bytecode", bytecode])
+    await cli.run(["--", "disassemble", "--file_path", "/workspace/disassemble/test"])
 
-    console.log(s)
+    const ntfExists = wasmfs.fs.existsSync("/workspace/disassemble/test.d")
 
-    expect(true).toBeTruthy()
+    if (ntfExists) {
+      wasmfs.fs.readFile("/workspace/disassemble/test.d", (_, v) => {
+        console.log(v?.toString())
+      })
+    } else {
+      wasmfs.fs.readFile("/workspace/disassemble/test.e", (_, v) => {
+        console.log(v?.toString())
+      })
+    }
+
+    expect(ntfExists).toBeTruthy()
   });
 
 });

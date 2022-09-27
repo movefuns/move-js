@@ -2,6 +2,9 @@ pub mod cli;
 pub mod targets;
 pub mod utils;
 
+use cli::DisassembleArgs;
+use std::fs::File;
+use std::io::{Read, Write};
 use walkdir::WalkDir;
 
 use move_compiler::compiled_unit::CompiledUnit;
@@ -9,6 +12,14 @@ use move_compiler::diagnostics::unwrap_or_report_diagnostics;
 use move_compiler::shared::{Flags, NumericalAddress};
 use move_compiler::Compiler;
 use targets::target::TargetType;
+
+use move_binary_format::{
+    binary_views::BinaryIndexedView,
+    file_format::{CompiledModule, CompiledScript},
+};
+use move_bytecode_source_map::mapping::SourceMapping;
+use move_disassembler::disassembler::{Disassembler, DisassemblerOptions};
+use move_ir_types::location::Spanned;
 
 use anyhow::{Error, Result};
 use std::collections::BTreeMap;
@@ -97,4 +108,65 @@ pub fn build_package(
     // Output compile targets
     let root_path = Path::new(&package_path);
     targets::target::output(&units, &targets, root_path, init_function)
+}
+
+pub fn disassemble(args: DisassembleArgs) {
+    let path = Path::new(&args.filePath);
+
+    let mut file = match File::open(&path) {
+        Err(e) => panic!("{}", e),
+        Ok(f) => f,
+    };
+
+    let mut s = String::new();
+    match file.read_to_string(&mut s) {
+        Ok(_) => println!("ok"),
+        Err(e) => println!("{}", e),
+    }
+
+    let bytecode_bytes = hex::decode(s.as_bytes()).unwrap();
+
+    let mut disassembler_options = DisassemblerOptions::new();
+    disassembler_options.print_code = !args.skip_code;
+    disassembler_options.only_externally_visible = !args.skip_private;
+    disassembler_options.print_basic_blocks = !args.skip_basic_blocks;
+    disassembler_options.print_locals = !args.skip_locals;
+
+    let no_loc = Spanned::unsafe_no_loc(()).loc;
+    let module: CompiledModule;
+    let script: CompiledScript;
+    let biv = if args.is_script {
+        script = CompiledScript::deserialize(&bytecode_bytes)
+            .expect("Script blob can't be deserialized");
+        BinaryIndexedView::Script(&script)
+    } else {
+        module = CompiledModule::deserialize(&bytecode_bytes)
+            .expect("Module blob can't be deserialized");
+        BinaryIndexedView::Module(&module)
+    };
+
+    let source_mapping =
+        SourceMapping::new_from_view(biv, no_loc).expect("Unable to build dummy source mapping");
+
+    let disassembler = Disassembler::new(source_mapping, disassembler_options);
+
+    let result = match disassembler.disassemble() {
+        Ok(v) => ("d", v),
+        Err(e) => ("e", e.to_string()),
+    };
+
+    let mut output = path.parent().unwrap().to_path_buf();
+
+    output.push(format!(
+        "{}.{}",
+        path.file_name().unwrap().to_str().unwrap(),
+        result.0
+    ));
+
+    let mut f = File::create(output.as_path()).unwrap();
+
+    match writeln!(f, "{:?}", result.1) {
+        Err(e) => panic!("{}", e),
+        _ => {}
+    }
 }

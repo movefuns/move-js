@@ -2,13 +2,6 @@ use std::env;
 use std::panic;
 
 use clap::Parser;
-use move_binary_format::{
-    binary_views::BinaryIndexedView,
-    file_format::{CompiledModule, CompiledScript},
-};
-use move_bytecode_source_map::mapping::SourceMapping;
-use move_disassembler::disassembler::{Disassembler, DisassemblerOptions};
-use move_ir_types::location::Spanned;
 
 use move_web::cli::{CliOptions, Commands};
 
@@ -49,8 +42,6 @@ fn main() -> std::io::Result<()> {
                 None => vec![],
             };
 
-            println!("dependency_dirs: {:?}", dependency_dirs);
-
             let address_maps = match address_maps {
                 Some(ref v) => v
                     .split(",")
@@ -58,19 +49,15 @@ fn main() -> std::io::Result<()> {
                     .collect(),
                 None => vec![], // None => vec!<&str, &str>[],
             };
-            println!("address_maps: {:?}", address_maps);
 
             let targets = match targets {
                 Some(ref v) => v.split(",").collect(),
                 None => vec!["starcoin"],
             };
-            println!("targets: {:?}", targets);
 
             let test_mode = test.unwrap_or(false);
-            println!("test_mode: {:?}", test);
 
             let init_function = init_function.unwrap_or("".to_string());
-            println!("init_function: {:?}", init_function);
 
             let ret = move_web::build_package(
                 &pwd,
@@ -90,56 +77,7 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        Commands::Disassemble {
-            skip_private,
-            skip_code,
-            skip_locals,
-            skip_basic_blocks,
-            is_script,
-            bytecode,
-        } => {
-            let bytecode_bytes = hex::decode(bytecode).unwrap();
-
-            let mut disassembler_options = DisassemblerOptions::new();
-            disassembler_options.print_code = !skip_code;
-            disassembler_options.only_externally_visible = !skip_private;
-            disassembler_options.print_basic_blocks = !skip_basic_blocks;
-            disassembler_options.print_locals = !skip_locals;
-
-            let no_loc = Spanned::unsafe_no_loc(()).loc;
-            let module: CompiledModule;
-            let script: CompiledScript;
-            let bytecode = if is_script {
-                script = CompiledScript::deserialize(&bytecode_bytes)
-                    .expect("Script blob can't be deserialized");
-                BinaryIndexedView::Script(&script)
-            } else {
-                module = CompiledModule::deserialize(&bytecode_bytes)
-                    .expect("Module blob can't be deserialized");
-                BinaryIndexedView::Module(&module)
-            };
-
-            let source_mapping = SourceMapping::new_from_view(bytecode, no_loc)
-                .expect("Unable to build dummy source mapping");
-
-            let disassembler = Disassembler::new(source_mapping, disassembler_options);
-
-            match disassembler.disassemble() {
-                Ok(v) => {
-                    println!("ok");
-                    println!("{}", v);
-                }
-                Err(e) => {
-                    println!("err");
-                    println!("{}", e);
-                }
-            }
-
-            // let dissassemble_string = disassembler.disassemble().expect("Unable to dissassemble");
-            //
-            //
-            // println!("hello, dissassemble {}", dissassemble_string);
-        }
+        Commands::Disassemble(args) => move_web::disassemble(args),
     }
 
     Ok(())

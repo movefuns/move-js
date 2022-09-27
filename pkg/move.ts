@@ -83,7 +83,9 @@ export class Move implements IMove {
     console.log('Standard Output: \n' + stdout)
 
     const stderr = await this.getStdErr()
-    console.error('Standard Error: \n' + stderr)
+    if (stderr) {
+      console.error('Standard Error: \n' + stderr)
+    }
 
     return stdout;
   }

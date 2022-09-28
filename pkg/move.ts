@@ -87,7 +87,7 @@ export class Move implements IMove {
       console.error('Standard Error: \n' + stderr)
     }
 
-    return stdout;
+    return stdout
   }
 
   async getStdErr() {

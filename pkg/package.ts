@@ -1,6 +1,6 @@
 import * as path from 'path'
 import * as TOML from '@iarna/toml'
-import lib, { WasmFs } from '@wasmer/wasmfs'
+import { WasmFs } from '@wasmer/wasmfs'
 import { Move } from '../pkg/move'
 
 export interface IDependency {
@@ -19,48 +19,11 @@ export interface IMovePackage {
   build(): void
 }
 
-export interface IDisassemblePackage {
-  disassemble(name: string, bytecode: string, callback: (ok: boolean, data: string) => void): Promise<void>
-}
-
 export type MoveOptions = {
-  packagePath: string,
-  test: boolean,
+  packagePath: string
+  test: boolean
   alias?: Map<string, string>
   initFunction?: string
-};
-
-export class DisassemblePackage implements IDisassemblePackage {
-  private wasmfs: WasmFs
-
-  constructor(
-    wasmfs: WasmFs,
-  ) {
-    this.wasmfs = wasmfs
-  }
-
-  public async disassemble(name: string, bytecode: string, callback: (ok: boolean, data: string) => void): Promise<void> {
-    const root = "/workspace/disassemble/"
-    this.wasmfs.fs.mkdirpSync(root)
-
-    const codePath = root + name
-    this.wasmfs.fs.writeFileSync(codePath, bytecode)
-
-    const cli = new Move(this.wasmfs, {
-      pwd: "/workspace/disassemble/",
-      preopens: ['/workspace'],
-    })
-
-    await cli.run(["--", "disassemble", "--file_path", codePath])
-
-    const ntfExists = this.wasmfs.fs.existsSync(codePath + ".d")
-
-    if (ntfExists) {
-      await this.wasmfs.fs.readFile(codePath + ".d", (_, v) => callback(true, v?.toString()))
-    } else {
-      await this.wasmfs.fs.readFile(codePath + ".e", (_, v) => callback(false, v?.toString()))
-    }
-  }
 }
 
 export class MovePackage implements IMovePackage {
@@ -76,10 +39,7 @@ export class MovePackage implements IMovePackage {
   private test: boolean
   private initFunction?: string
 
-  constructor(
-    wasmfs: WasmFs,
-    opts: MoveOptions
-  ) {
+  constructor(wasmfs: WasmFs, opts: MoveOptions) {
     this.wasmfs = wasmfs
     this.packagePath = opts.packagePath
 
@@ -177,8 +137,9 @@ export class MovePackage implements IMovePackage {
 
           new MovePackage(this.wasmfs, {
             packagePath: aliasPath,
-            test: false
-          }).getAllDeps()
+            test: false,
+          })
+            .getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -192,8 +153,9 @@ export class MovePackage implements IMovePackage {
 
           new MovePackage(this.wasmfs, {
             packagePath: depPath,
-            test: false
-          }).getAllDeps()
+            test: false,
+          })
+            .getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -262,7 +224,7 @@ export class MovePackage implements IMovePackage {
     wasmfs: WasmFs,
     packagePath: string,
     deps: string[],
-    addresses: Map<string, string>,
+    addresses: Map<string, string>
   ): Promise<void> {
     console.log('Building ', this.name)
 
@@ -278,7 +240,7 @@ export class MovePackage implements IMovePackage {
     })
     const addressArgs = addressMaps.join(',')
 
-    let initFunction = ""
+    let initFunction = ''
     if (this.initFunction) {
       initFunction = this.initFunction
     }

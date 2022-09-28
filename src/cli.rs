@@ -30,24 +30,6 @@ pub enum Commands {
     Disassemble(DisassembleArgs),
 }
 
-// #[derive(Parser)]
-// pub struct BuildArgs {
-//     #[clap(long = "dependency_dirs")]
-//     pub dependency_dirs: Option<String>,
-
-//     #[clap(long = "address_maps")]
-//     pub address_maps: Option<String>,
-
-//     #[clap(long = "targets", short = 't')]
-//     pub targets: Option<String>,
-
-//     #[clap(long = "test")]
-//     pub test: Option<bool>,
-
-//     #[clap(long = "init_function", short = 'i')]
-//     pub init_function: Option<String>,
-// }
-
 #[derive(Parser)]
 pub struct DisassembleArgs {
     /// Skip printing of private functions.

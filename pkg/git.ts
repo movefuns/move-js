@@ -2,7 +2,6 @@ import { WasmFs } from '@wasmer/wasmfs'
 import * as zip from '@zip.js/zip.js'
 import * as path from 'path'
 
-
 /**
  * Git interface
  */

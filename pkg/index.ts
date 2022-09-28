@@ -1,5 +1,6 @@
 import { Git } from './git'
 import { Move } from './move'
-import { MovePackage, DisassemblePackage } from './package'
+import { MovePackage } from './package'
+import { Disassemble } from './disassemble'
 
-export { Git, Move, MovePackage, DisassemblePackage }
+export { Git, Move, MovePackage, Disassemble }

@@ -43,6 +43,7 @@ export class Move implements IMove {
     }
 
     console.log('preopens:', preopens)
+    console.log(args)
 
     const wasi = new WASI({
       preopens,

@@ -139,7 +139,7 @@ export class MovePackage implements IMovePackage {
           allDeps.push(aliasPath)
 
           new MovePackage(this.wasmfs, {
-            packagePath: aliasPath, 
+            packagePath: aliasPath,
             test: false
           }).getAllDeps()
             .forEach((depName: string) => {
@@ -154,7 +154,7 @@ export class MovePackage implements IMovePackage {
           allDeps.push(depPath)
 
           new MovePackage(this.wasmfs, {
-            packagePath: depPath, 
+            packagePath: depPath,
             test: false
           }).getAllDeps()
             .forEach((depName: string) => {
@@ -252,6 +252,8 @@ export class MovePackage implements IMovePackage {
     console.log('initFunction:', initFunction)
 
     await cli.run([
+      '--',
+      'build',
       '--dependency_dirs',
       depDirs,
       '--address_maps',

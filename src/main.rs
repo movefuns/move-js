@@ -1,61 +1,8 @@
-extern crate args;
-extern crate getopts;
-
-use args::Args;
-use getopts::Occur;
 use std::env;
 use std::panic;
 
-const PROGRAM_DESC: &'static str = "Run this program";
-const PROGRAM_NAME: &'static str = "move-web";
-
-fn parse_args() -> Args {
-    let mut args = Args::new(PROGRAM_NAME, PROGRAM_DESC);
-    args.flag("h", "help", "Print the usage menu");
-    args.option(
-        "",
-        "dependency_dirs",
-        "dependency Directory",
-        "",
-        Occur::Optional,
-        Some(String::from("")),
-    );
-    args.option(
-        "",
-        "address_maps",
-        "address maps",
-        "",
-        Occur::Optional,
-        Some(String::from("")),
-    );
-    args.option(
-        "t",
-        "targets",
-        "target chain",
-        "",
-        Occur::Optional,
-        Some(String::from("")),
-    );
-    args.option(
-        "",
-        "test",
-        "Compile in 'test' mode",
-        "",
-        Occur::Optional,
-        Some(String::from("false")),
-    );
-    args.option(
-        "i",
-        "init_function",
-        " init script function to execute, example: 0x123::MyScripts::init_scr",
-        "",
-        Occur::Optional,
-        Some(String::from("")),
-    );
-
-    args.parse(env::args()).expect("no error when parse");
-    args
-}
+use clap::Parser;
+use move_web::cli::{CliOptions, Commands};
 
 fn hook_impl(info: &panic::PanicInfo) {
     let _ = println!("{}", info);
@@ -79,56 +26,64 @@ fn main() -> std::io::Result<()> {
     let pwd = env::var("PWD").expect("must has set PWD env");
     println!("pwd: {:?}", pwd);
 
-    let args = parse_args();
+    let args = CliOptions::parse();
 
-    let default_deps = String::from("");
-    let mut dependency_dirs: Vec<&str> = vec![];
-    let dependency_dirs_text = args
-        .value_of::<String>(&"dependency_dirs")
-        .unwrap_or(default_deps);
-    if dependency_dirs_text != "" {
-        dependency_dirs = dependency_dirs_text.as_str().split(",").collect();
-    }
-    println!("dependency_dirs: {:?}", dependency_dirs);
+    match args.commands {
+        Commands::Build {
+            dependency_dirs,
+            address_maps,
+            targets,
+            test,
+            init_function,
+        } => {
+            let dependency_dirs = match dependency_dirs {
+                Some(ref v) => v.split(",").collect(),
+                None => vec![],
+            };
 
-    let default_address_map = String::from("");
-    let mut addresse_maps: Vec<(&str, &str)> = vec![];
-    let addresse_maps_text = args
-        .value_of::<String>("address_maps")
-        .unwrap_or(default_address_map);
-    if addresse_maps_text != "" {
-        addresse_maps = addresse_maps_text
-            .as_str()
-            .split(",")
-            .map(|x: &str| parse_address_map(x).unwrap())
-            .collect();
-    }
-    println!("address_maps: {:?}", addresse_maps);
+            println!("dependency_dirs: {:?}", dependency_dirs);
 
-    let default_targets = String::from("starcoin");
-    let mut targets: Vec<&str> = vec![];
-    let targets_text = args
-        .value_of::<String>(&"targets")
-        .unwrap_or(default_targets);
-    if targets_text != "" {
-        targets = targets_text.as_str().split(",").collect();
-    }
-    println!("targets: {:?}", targets);
+            let address_maps = match address_maps {
+                Some(ref v) => v
+                    .split(",")
+                    .map(|x: &str| parse_address_map(x).unwrap())
+                    .collect(),
+                None => vec![], // None => vec!<&str, &str>[],
+            };
+            println!("address_maps: {:?}", address_maps);
 
-    let test_mode = args.value_of::<bool>("test").unwrap_or(false);
-    println!("test_mode: {:?}", test_mode);
+            let targets = match targets {
+                Some(ref v) => v.split(",").collect(),
+                None => vec!["starcoin"],
+            };
+            println!("targets: {:?}", targets);
 
-    let default_init_func = String::from("");
-    let init_function = args.value_of::<String>("init_function").unwrap_or(default_init_func);
-    println!("init_function: {:?}", init_function);
+            let test_mode = test.unwrap_or(false);
+            println!("test_mode: {:?}", test);
 
-    let ret = move_web::build_package(&pwd, &dependency_dirs, &addresse_maps, &targets, test_mode, init_function.as_str());
-    match ret {
-        Ok(()) => {
-            println!("build package ok");
+            let init_function = init_function.unwrap_or("".to_string());
+            println!("init_function: {:?}", init_function);
+
+            let ret = move_web::build_package(
+                &pwd,
+                &dependency_dirs,
+                &address_maps,
+                &targets,
+                test_mode,
+                init_function.as_str(),
+            );
+            match ret {
+                Ok(()) => {
+                    println!("build package ok");
+                }
+                Err(e) => {
+                    println!("build package error: {:?}", e);
+                }
+            }
         }
-        Err(e) => {
-            println!("build package error: {:?}", e);
+
+        Commands::Disassemble { codes: _ } => {
+            println!("hello, dissassemble");
         }
     }
 

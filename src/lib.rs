@@ -1,3 +1,4 @@
+pub mod cli;
 pub mod targets;
 pub mod utils;
 

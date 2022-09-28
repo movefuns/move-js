@@ -111,7 +111,7 @@ pub fn build_package(
 }
 
 pub fn disassemble(args: DisassembleArgs) {
-    let path = Path::new(&args.file_Path);
+    let path = Path::new(&args.file_path);
 
     let mut file = match File::open(&path) {
         Err(e) => panic!("{}", e),

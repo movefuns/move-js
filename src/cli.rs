@@ -56,5 +56,5 @@ pub struct DisassembleArgs {
     /// other files reside under the same directory: a source map file.mvsm (possibly) and the Move
     /// source code file.move.
     #[clap(short = 'b', long = "file_path")]
-    pub file_Path: String,
+    pub file_path: String,
 }

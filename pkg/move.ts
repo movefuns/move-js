@@ -42,9 +42,6 @@ export class Move implements IMove {
       preopens[opts.pwd] = opts.pwd
     }
 
-    console.log('preopens:', preopens)
-    console.log(args)
-
     const wasi = new WASI({
       preopens,
 
@@ -80,7 +77,6 @@ export class Move implements IMove {
 
     // Output what's inside of /dev/stdout!
     const stdout = await this.wasmFs.getStdOut()
-    console.log('Standard Output: \n' + stdout)
 
     const stderr = await this.getStdErr()
     if (stderr) {

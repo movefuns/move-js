@@ -124,6 +124,10 @@ pub fn disassemble(args: DisassembleArgs) {
         Err(e) => println!("{}", e),
     }
 
+    if s.find("x") != Some(0) {
+        s.replace_range(0..2, "");
+    }
+
     let bytecode_bytes = hex::decode(s.as_bytes()).unwrap();
 
     let mut disassembler_options = DisassemblerOptions::new();
@@ -165,7 +169,9 @@ pub fn disassemble(args: DisassembleArgs) {
 
     let mut f = File::create(output.as_path()).unwrap();
 
-    match writeln!(f, "{:?}", result.1) {
+    println!("{}", result.1);
+
+    match writeln!(f, "{}", result.1) {
         Err(e) => panic!("{}", e),
         _ => {}
     }

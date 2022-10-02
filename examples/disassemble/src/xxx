@@ -1,0 +1,253 @@
+import * as React from 'react';
+import Box from '@mui/material/Box';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import TreeView from '@mui/lab/TreeView';
+import { isString } from 'lodash';
+import { WasmFs } from '@wasmer/wasmfs';
+import { Disassemble } from '@starcoin/move-js';
+import { Typography } from '@mui/material';
+import { useState } from 'react';
+import TreeItem, {
+    TreeItemProps,
+    useTreeItem,
+    TreeItemContentProps,
+} from '@mui/lab/TreeItem';
+import clsx from 'clsx';
+
+type Props = {
+    codes: any
+}
+
+
+function FunctionItem(props: Props) {
+    const { codes } = props;
+    return <>{codes.map((item: any, index: any) => {
+
+        const prams = item.args.map((arg: any) => {
+            let type_tag;
+            if (isString(arg.type_tag)) {
+                type_tag = arg.type_tag;
+            } else {
+                type_tag = Object.keys(arg.type_tag).map((key) => {
+                    return `${key}<${arg.type_tag[key]}>`;
+                }).join(', ');
+            }
+            return `${arg.name}: ${type_tag}`;
+        }).join(', ');
+
+        return <TreeItem nodeId={`function${item.name}${index}`} key={item.name + index}
+            label={`${item.name}( ${prams} )`} />;
+    })}</>;
+}
+
+
+function structField(fields: any) {
+    return fields.map((field: any) => {
+        let type_abi;
+        if (isString(field.type_abi)) {
+            type_abi = field.type_abi;
+        } else {
+            type_abi = structAbi(field.type_abi);
+        }
+        return `${field.name}: ${type_abi}`;
+    }).join(' , ');
+}
+
+// @ts-ignore
+function structAbi(type_abi: any) {
+    return Object.keys(type_abi).map((abi: any) => {
+
+        let inner;
+        switch (abi) {
+            case 'Struct':
+                const innerStruct = structField(type_abi.Struct.fields);
+                inner = `${type_abi.Struct.name} { ${innerStruct} } `;
+                break;
+            case 'Vector':
+                if (isString(type_abi.Vector)) {
+                    inner = `Vector<${type_abi.Vector}>`;
+                } else {
+                    inner = structAbi(type_abi.Vector);
+                    inner = `Vector<${inner}>`;
+                }
+                break;
+            default:
+        }
+
+        return `${inner}`;
+    }).join(', \n');
+}
+
+
+function StructItem(props: Props) {
+    const { codes } = props;
+    return <>{codes.map((item: any, index: any) => {
+        const fields = structField(item.fields);
+        return <div key={item.name + index}> <TreeItem nodeId={`struct${item.name}${index}`} label={`${item.name} { ${fields} } `} />
+            <br /> </div>;
+    })}</>;
+}
+
+
+// const CustomTreeItem = (props: TreeItemProps) => (
+//   <TreeItem ContentComponent={CustomContent} {...props} />
+// );  
+
+
+export default function CodeContent(props: Props) {
+    const { codes } = props;
+
+    const [expanded, setExpanded] = React.useState<string[]>([]);
+    const [selected, setSelected] = useState<string[]>([]);
+
+    const CustomContent = React.forwardRef(function CustomContent(
+        props: TreeItemContentProps,
+        ref,
+    ) {
+        const {
+            classes,
+            className,
+            label,
+            nodeId,
+            icon: iconProp,
+            expansionIcon,
+            displayIcon,
+        } = props;
+
+        const {
+            disabled,
+            expanded,
+            selected,
+            focused,
+            handleExpansion,
+            handleSelection,
+            preventSelection,
+        } = useTreeItem(nodeId);
+
+        const icon = iconProp || expansionIcon || displayIcon;
+
+        const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+            preventSelection(event);
+        };
+
+        const handleExpansionClick = (
+            event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        ) => {
+            handleExpansion(event);
+        };
+
+        const handleSelectionClick = (
+            event: React.MouseEvent<HTMLDivElement, MouseEvent>,
+        ) => {
+            handleSelection(event);
+        };
+
+        return (
+            // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+            <div
+                className={clsx(className, classes.root, {
+                    [classes.expanded]: expanded,
+                    [classes.selected]: selected,
+                    [classes.focused]: focused,
+                    [classes.disabled]: disabled,
+                })}
+                onMouseDown={handleMouseDown}
+                ref={ref as React.Ref<HTMLDivElement>}
+            >
+                {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/no-static-element-interactions */}
+                <div onClick={handleExpansionClick} className={classes.iconContainer}>
+                    {icon}
+                </div>
+                <Typography
+                    onClick={handleSelectionClick}
+                    component="div"
+                    className={classes.label}
+                >
+                    {label}
+                </Typography>
+            </div>
+        );
+    });
+
+    if (codes.length === 0) {
+        return <div> no data </div>
+    }
+
+    const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+        setExpanded(nodeIds);
+    };
+
+    const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
+        setSelected(nodeIds);
+    };
+
+    const dis = () => {
+        const vfs = new WasmFs();
+
+        const mp = new Disassemble(vfs);
+
+        mp.disassemble("test", "a11ceb0b040000000601000403040f051307071a60087a100c8a011800000001000200010000030001000104020100010c0002060c010e4163636f756e7453637269707473074163636f756e741964697361626c655f6175746f5f6163636570745f746f6b656e18656e61626c655f6175746f5f6163636570745f746f6b656e157365745f6175746f5f6163636570745f746f6b656e000000000000000000000000000000010002000001040e00091102020102000001040e000811020200", (ok: boolean, data: string) => {
+            console.log(ok)
+            console.log(data)
+        })
+
+    }
+
+    dis();
+
+    console.log(expanded)
+    console.log(selected)
+
+    return (
+        <Box sx={{ height: '100%', flexGrow: 1, maxWidth: '100%', overflowY: 'auto' }}>
+            <TreeView
+                aria-label='controlled'
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                expanded={expanded}
+                selected={selected}
+                onNodeToggle={handleToggle}
+                onNodeSelect={handleSelect}
+                multiSelect
+            >
+
+                {codes.map((item: any, index: any) => {
+                    return <TreeItem ContentComponent={CustomContent} nodeId={item.name + index} key={item.name + index} label='asds'>
+
+                        {
+                            item.code.script_functions.length > 0 ?
+                                <TreeItem nodeId={`${item.name}${index}1`} label='script_functions'>
+                                    <FunctionItem codes={item.code.script_functions} />
+                                </TreeItem>
+                                : <TreeItem nodeId={`${item.name}${index}1`} label='script_functions' />
+                        }
+
+                        {
+                            item.code.structs.length > 0 ?
+                                <TreeItem nodeId={`${item.name}${index}2`} label='structs'>
+                                    <StructItem codes={item.code.structs} />
+                                </TreeItem>
+                                : <TreeItem nodeId={`${item.name}${index}2`} label='structs' />
+                        }
+
+                    </TreeItem >;
+
+                })}
+            </TreeView >
+        </Box >
+    );
+}
+
+// {
+//   <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
+//     {/* <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} /> */}
+//     <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+//       {item.name}
+
+//     </Typography>
+//     {
+//       expanded.includes(item.name + index) ? <Button onClick={dis} >disassemble</Button> : <></>
+//     }
+//   </Box>
+// }

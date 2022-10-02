@@ -1,9 +1,10 @@
 # move-js
 
-Javascript version of the move language compiler, supports compiling Move code into move bytecode in the browser.
+Javascript version of the move language compiler and disassemble
 
 ## Features
 - Compiling move package into blob
+- Disassemble contract
 
 ## Example
 
@@ -35,4 +36,31 @@ const startWasiTask = async () => {
 }
 
 startWasiTask()
+```
+
+```ts
+import { WasmFs } from '@wasmer/wasmfs'
+import { Disassemble } from '@starcoin/move-js'
+
+const startDisassembleTask = async (app: HTMLDivElement) => {
+  const wasmfs = new WasmFs()
+
+  const dp = new Disassemble(wasmfs)
+
+  // Chain code
+  const account_scripts = "you code"
+
+  dp.disassemble("account_scripts", account_scripts, (ok: boolean, data: string) => {
+    console.log(ok)
+    console.log(data)
+  })
+
+  app.innerHTML = `
+      <h1>view disassemble in console:</h1>
+    `
+}
+
+const app = document.querySelector<HTMLDivElement>('#app')!
+startDisassembleTask(app)
+const 
 ```

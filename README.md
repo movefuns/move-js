@@ -8,6 +8,7 @@ Javascript version of the move language compiler and disassemble
 
 ## Example
 
+* Compiling move package into blob example
 ```ts
 import { WasmFs } from '@wasmer/wasmfs'
 import { Git, MovePackage } from '@starcoin/move-js'
@@ -38,6 +39,7 @@ const startWasiTask = async () => {
 startWasiTask()
 ```
 
+* Disassemble contract example
 ```ts
 import { WasmFs } from '@wasmer/wasmfs'
 import { Disassemble } from '@starcoin/move-js'

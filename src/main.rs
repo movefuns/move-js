@@ -2,6 +2,7 @@ use std::env;
 use std::panic;
 
 use clap::Parser;
+
 use move_web::cli::{CliOptions, Commands};
 
 fn hook_impl(info: &panic::PanicInfo) {
@@ -41,8 +42,6 @@ fn main() -> std::io::Result<()> {
                 None => vec![],
             };
 
-            println!("dependency_dirs: {:?}", dependency_dirs);
-
             let address_maps = match address_maps {
                 Some(ref v) => v
                     .split(",")
@@ -50,19 +49,15 @@ fn main() -> std::io::Result<()> {
                     .collect(),
                 None => vec![], // None => vec!<&str, &str>[],
             };
-            println!("address_maps: {:?}", address_maps);
 
             let targets = match targets {
                 Some(ref v) => v.split(",").collect(),
                 None => vec!["starcoin"],
             };
-            println!("targets: {:?}", targets);
 
             let test_mode = test.unwrap_or(false);
-            println!("test_mode: {:?}", test);
 
             let init_function = init_function.unwrap_or("".to_string());
-            println!("init_function: {:?}", init_function);
 
             let ret = move_web::build_package(
                 &pwd,
@@ -82,9 +77,7 @@ fn main() -> std::io::Result<()> {
             }
         }
 
-        Commands::Disassemble { codes: _ } => {
-            println!("hello, dissassemble");
-        }
+        Commands::Disassemble(args) => move_web::disassemble(args),
     }
 
     Ok(())

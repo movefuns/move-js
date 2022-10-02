@@ -55,4 +55,30 @@ describe("Move", () => {
     expect(ntfExists).toBeTruthy()
   });
 
+  it("run disassemble should be ok", async () => {
+
+    await git.download("./base/test/data/disassemble.zip", "/workspace/disassemble")
+
+    let cli = new Move(wasmfs, {
+      pwd: "/workspace/disassemble",
+      preopens: ["/workspace"]
+    })
+
+    await cli.run(["--", "disassemble", "--file_path", "/workspace/disassemble/test"])
+
+    const ntfExists = wasmfs.fs.existsSync("/workspace/disassemble/test.d")
+
+    if (ntfExists) {
+      wasmfs.fs.readFile("/workspace/disassemble/test.d", (_, v) => {
+        console.log(v?.toString())
+      })
+    } else {
+      wasmfs.fs.readFile("/workspace/disassemble/test.e", (_, v) => {
+        console.log(v?.toString())
+      })
+    }
+
+    expect(ntfExists).toBeTruthy()
+  });
+
 });

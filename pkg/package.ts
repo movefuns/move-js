@@ -20,11 +20,11 @@ export interface IMovePackage {
 }
 
 export type MoveOptions = {
-  packagePath: string,
-  test: boolean,
+  packagePath: string
+  test: boolean
   alias?: Map<string, string>
   initFunction?: string
-};
+}
 
 export class MovePackage implements IMovePackage {
   public name?: string
@@ -39,10 +39,7 @@ export class MovePackage implements IMovePackage {
   private test: boolean
   private initFunction?: string
 
-  constructor(
-    wasmfs: WasmFs,
-    opts: MoveOptions
-  ) {
+  constructor(wasmfs: WasmFs, opts: MoveOptions) {
     this.wasmfs = wasmfs
     this.packagePath = opts.packagePath
 
@@ -140,8 +137,9 @@ export class MovePackage implements IMovePackage {
 
           new MovePackage(this.wasmfs, {
             packagePath: aliasPath,
-            test: false
-          }).getAllDeps()
+            test: false,
+          })
+            .getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -155,8 +153,9 @@ export class MovePackage implements IMovePackage {
 
           new MovePackage(this.wasmfs, {
             packagePath: depPath,
-            test: false
-          }).getAllDeps()
+            test: false,
+          })
+            .getAllDeps()
             .forEach((depName: string) => {
               allDeps.push(depName)
             })
@@ -225,7 +224,7 @@ export class MovePackage implements IMovePackage {
     wasmfs: WasmFs,
     packagePath: string,
     deps: string[],
-    addresses: Map<string, string>,
+    addresses: Map<string, string>
   ): Promise<void> {
     console.log('Building ', this.name)
 
@@ -241,7 +240,7 @@ export class MovePackage implements IMovePackage {
     })
     const addressArgs = addressMaps.join(',')
 
-    let initFunction = ""
+    let initFunction = ''
     if (this.initFunction) {
       initFunction = this.initFunction
     }

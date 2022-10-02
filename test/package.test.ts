@@ -1,6 +1,7 @@
 import { WasmFs } from '@wasmer/wasmfs'
 import { Git } from "../pkg/git";
-import { IMovePackage, MovePackage } from "../pkg/package";
+import { MovePackage, } from "../pkg/package";
+import { Disassemble } from "../pkg/disassemble";
 
 describe("Package", () => {
   let wasmfs: WasmFs;
@@ -23,6 +24,7 @@ describe("Package", () => {
     expect(mp.version).toBe("0.1.0")
 
     expect(mp.addresses.size).toBe(3)
+
     expect(mp.addresses.get("StarcoinFramework")).toBe("0x1")
     expect(mp.addresses.get("StarcoinAssociation")).toBe("0xA550C18")
     expect(mp.addresses.get("VMReserved")).toBe("0x0")
@@ -97,5 +99,4 @@ describe("Package", () => {
     const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
-
 });

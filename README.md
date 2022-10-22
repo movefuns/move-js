@@ -64,5 +64,4 @@ const startDisassembleTask = async (app: HTMLDivElement) => {
 
 const app = document.querySelector<HTMLDivElement>('#app')!
 startDisassembleTask(app)
-const 
 ```

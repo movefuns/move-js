@@ -29,6 +29,8 @@ move-binary-format = { git = "https://github.com/starcoinorg/move", rev = "4735f
 move-disassembler = {git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"}
 move-bytecode-source-map = {git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"}
 move-ir-types = {git = "https://github.com/starcoinorg/move", rev = "4735fa59b63e1b30622411d8af65129e4c80b3bc"}
+starcoin-crypto = {git = "https://github.com/pym-labs/starcoin-crypto", rev = "ada7f71f3585670106e356f82a8d817e8115b41b"}
+
 [[bin]]
 name = "move-web"
 path = "src/main.rs"

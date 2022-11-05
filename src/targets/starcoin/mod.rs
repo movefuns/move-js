@@ -11,6 +11,7 @@ use types::function::FunctionId;
 use types::module::Module;
 use types::package::Package;
 use types::script::ScriptFunction;
+use starcoin_crypto::hash::PlainCryptoHash;
 
 pub struct StarcoinTarget {}
 
@@ -82,10 +83,21 @@ fn save_release_package(
     let release_path = {
         std::fs::create_dir_all(&release_dir)?;
         release_dir.push(format!("{}.blob", "package"));
-        release_dir
+        release_dir.to_path_buf()
     };
     std::fs::write(&release_path, blob)?;
-    println!("build done, saved: {}", release_path.display());
+
+    let release_hash_path = {
+        release_dir.pop();
+        release_dir.push("hash.txt");
+        release_dir
+    };
+
+    let hash = p.crypto_hash().to_string();
+    
+    std::fs::write(&release_hash_path, &hash)?;
+
+    println!("build done, saved: {}, {}", release_path.display(), hash);
 
     Ok(())
 }

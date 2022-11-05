@@ -97,6 +97,17 @@ describe("Package", () => {
     await mp.build()
 
     const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
+
+    const hash = wasmfs.fs.existsSync("/workspace/starcoin-framework/target/starcoin/release/hash.txt")
+
+    if (hash) {
+      wasmfs.fs.readFile("/workspace/starcoin-framework/target/starcoin/release/hash.txt", (_, v) => {
+        console.log(v?.toString())
+      })
+    }
+    
+    console.log(hash)
+
     expect(ntfExists).toBeTruthy()
   });
 });

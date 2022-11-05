@@ -22,6 +22,7 @@ const startWasiTask = async (app: HTMLDivElement) => {
   await mp.build()
 
   const blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
+  const hash = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/hash.txt")
 
   const base64Data = blobBuf.toString("base64")
   console.log("my-counter blob:", base64Data)
@@ -29,6 +30,7 @@ const startWasiTask = async (app: HTMLDivElement) => {
   app.innerHTML = `
       <h1>my-counter blob:</h1>
       ${base64Data}
+      ${hash}
     `
 }
 

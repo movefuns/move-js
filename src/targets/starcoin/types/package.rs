@@ -9,11 +9,13 @@ use serde::{Deserialize, Serialize};
 
 use starcoin_crypto::hash::{CryptoHash, CryptoHasher};
 
-use crate::utils::bcs_ext;
 use crate::targets::starcoin::types::module::Module;
 use crate::targets::starcoin::types::script::ScriptFunction;
+use crate::utils::bcs_ext;
 
-#[derive(Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, JsonSchema)]
+#[derive(
+    Clone, Debug, Hash, Eq, PartialEq, Serialize, Deserialize, CryptoHasher, CryptoHash, JsonSchema,
+)]
 pub struct Package {
     ///Package's all Module must at same address.
     #[schemars(with = "String")]

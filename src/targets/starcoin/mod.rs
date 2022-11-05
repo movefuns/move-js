@@ -6,12 +6,12 @@ use move_compiler::compiled_unit::{CompiledUnit, NamedCompiledModule};
 use crate::targets::target::Target;
 use crate::utils::bcs_ext;
 use anyhow::{Error, Result};
+use starcoin_crypto::hash::PlainCryptoHash;
 use std::path::Path;
 use types::function::FunctionId;
 use types::module::Module;
 use types::package::Package;
 use types::script::ScriptFunction;
-use starcoin_crypto::hash::PlainCryptoHash;
 
 pub struct StarcoinTarget {}
 
@@ -94,7 +94,7 @@ fn save_release_package(
     };
 
     let hash = p.crypto_hash().to_string();
-    
+
     std::fs::write(&release_hash_path, &hash)?;
 
     println!("build done, saved: {}, {}", release_path.display(), hash);

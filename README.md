@@ -3,7 +3,7 @@
 Javascript version of the move language compiler and disassemble
 
 ## Features
-- Compiling move package into blob
+- Compiling move package into blob and generate hash
 - Disassemble contract
 
 ## Example
@@ -34,6 +34,9 @@ const startWasiTask = async () => {
     const blobBuf = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/package.blob")
     const base64Data = blobBuf.toString("base64")
     console.log("my-counter blob:", base64Data)
+
+    const hash = wasmfs.fs.readFileSync("/workspace/my-counter/target/starcoin/release/hash.txt")
+    console.log("my-counter blob hash:", hash)
 }
 
 startWasiTask()

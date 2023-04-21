@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Create a report to help Starcoin IDE to improve
+about: Create a report to help Move js to improve
 title: "bug: "
 labels: "bug"
 assignees: ""
@@ -8,7 +8,7 @@ assignees: ""
 
 # Bug Report
 
-**Starcoin IDE version:**
+**Move js version:**
 
 <!-- Please specify commit or tag version. -->
 

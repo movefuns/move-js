@@ -1,11 +1,11 @@
 {
-  "name": "@starcoin/move-js",
+  "name": "@movefuns/move-js",
   "version": "0.7.1",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
     "move",
     "rust",
-    "starcoin",
+    "movefuns",
     "smart contracts",
     "facebook",
     "diem",

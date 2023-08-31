@@ -86,14 +86,16 @@ pub fn build_package(
         targets.push(target);
     }
 
-    let mut flags = Flags::empty().set_sources_shadow_deps(true);
-    if test_mode {
-        flags = Flags::testing().set_sources_shadow_deps(true);
-    }
-
-    let c = Compiler::new(&sources, &deps)
-        .set_named_address_values(convert_named_addresses(address_maps))
-        .set_flags(flags);
+    // let c = Compiler::from_files(&sources, &deps)
+    //     .set_named_address_values(convert_named_addresses(address_maps))
+    //     .set_flags(flags);
+    let c = Compiler::from_files(sources, deps, convert_named_addresses(address_maps)).set_flags(
+        if test_mode {
+            Flags::testing().set_sources_shadow_deps(true)
+        } else {
+            Flags::empty().set_sources_shadow_deps(true)
+        },
+    );
 
     let (source_text, compiled_result) = c.build()?;
 

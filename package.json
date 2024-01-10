@@ -1,11 +1,11 @@
 {
-  "name": "@starcoin/move-js",
+  "name": "@aptos/move-js",
   "version": "0.7.1",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
     "move",
     "rust",
-    "starcoin",
+    "aptos",
     "smart contracts",
     "facebook",
     "diem",
@@ -21,7 +21,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/starcoinorg/move-js"
+    "url": "https://github.com/aptos-labs/move-js"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
@@ -41,7 +41,7 @@
     "clean": "rimraf dist && rimraf pkg/*.wasm",
     "release": "npm publish --access public --tag latest"
   },
-  "author": "starcoinorg",
+  "author": "aptos-labs",
   "license": "SEE LICENSE IN ./LICENSE",
   "peerDependencies": {
     "rollup": "2.x.x"

@@ -3,6 +3,7 @@ pub mod targets;
 pub mod utils;
 
 use cli::DisassembleArgs;
+use move_compiler::shared::known_attributes::KnownAttribute;
 use std::fs::File;
 use std::io::{Read, Write};
 use walkdir::WalkDir;
@@ -26,7 +27,7 @@ use std::collections::BTreeMap;
 
 use std::path::Path;
 
-fn convert_named_addresses(address_maps: &Vec<(&str, &str)>) -> BTreeMap<String, NumericalAddress> {
+fn convert_named_addresses(address_maps: &[(&str, &str)]) -> BTreeMap<String, NumericalAddress> {
     address_maps
         .iter()
         .map(|(name, addr)| (name.to_string(), NumericalAddress::parse_str(addr).unwrap()))
@@ -36,7 +37,7 @@ fn convert_named_addresses(address_maps: &Vec<(&str, &str)>) -> BTreeMap<String,
 pub fn build_package(
     package_path: &str,
     dep_dirs: &Vec<&str>,
-    address_maps: &Vec<(&str, &str)>,
+    address_maps: &[(&str, &str)],
     target_types: &Vec<&str>,
     test_mode: bool,
     init_function: &str,
@@ -53,11 +54,8 @@ pub fn build_package(
 
         if entry_raw.path().is_file() {
             let move_file_path = entry_raw.path().to_str();
-            match move_file_path {
-                Some(f) => {
-                    sources.push(f.to_string());
-                }
-                _ => {}
+            if let Some(f) = move_file_path {
+                sources.push(f.to_string());
             }
         }
     }
@@ -71,11 +69,8 @@ pub fn build_package(
 
             if entry_raw.path().is_file() {
                 let move_file_path = entry_raw.path().to_str();
-                match move_file_path {
-                    Some(f) => {
-                        deps.push(f.to_string());
-                    }
-                    _ => {}
+                if let Some(f) = move_file_path {
+                    deps.push(f.to_string());
                 }
             }
         }
@@ -86,14 +81,18 @@ pub fn build_package(
         targets.push(target);
     }
 
-    let mut flags = Flags::empty().set_sources_shadow_deps(true);
+    let mut flags = Flags::empty()
+        .set_sources_shadow_deps(true)
+        .set_skip_attribute_checks(true);
     if test_mode {
-        flags = Flags::testing().set_sources_shadow_deps(true);
+        flags = Flags::testing()
+            .set_sources_shadow_deps(true)
+            .set_skip_attribute_checks(true);
     }
 
-    let c = Compiler::new(&sources, &deps)
-        .set_named_address_values(convert_named_addresses(address_maps))
-        .set_flags(flags);
+    let named_address_map = convert_named_addresses(address_maps);
+    let known_attributes = KnownAttribute::get_all_attribute_names();
+    let c = Compiler::from_files(sources, deps, named_address_map, flags, known_attributes);
 
     let (source_text, compiled_result) = c.build()?;
 
@@ -113,7 +112,7 @@ pub fn build_package(
 pub fn disassemble(args: DisassembleArgs) {
     let path = Path::new(&args.file_path);
 
-    let mut file = match File::open(&path) {
+    let mut file = match File::open(path) {
         Err(e) => panic!("{}", e),
         Ok(f) => f,
     };
@@ -124,7 +123,8 @@ pub fn disassemble(args: DisassembleArgs) {
         Err(e) => println!("{}", e),
     }
 
-    if s.find("x") != Some(0) {
+    // remove 0x prefix
+    if s.starts_with("0x") {
         s.replace_range(0..2, "");
     }
 
@@ -171,8 +171,7 @@ pub fn disassemble(args: DisassembleArgs) {
 
     println!("{}", result.1);
 
-    match writeln!(f, "{}", result.1) {
-        Err(e) => panic!("{}", e),
-        _ => {}
+    if let Err(e) = writeln!(f, "{}", result.1) {
+        panic!("{}", e)
     }
 }

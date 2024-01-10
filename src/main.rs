@@ -6,18 +6,18 @@ use clap::Parser;
 use move_web::cli::{CliOptions, Commands};
 
 fn hook_impl(info: &panic::PanicInfo) {
-    let _ = println!("{}", info);
+    println!("{}", info);
 }
 
 fn parse_address_map(address_map: &str) -> Result<(&str, &str), String> {
-    let mut tokens = address_map.split(":");
+    let mut tokens = address_map.split(':');
 
     match tokens.next() {
         Some(name) => match tokens.next() {
             Some(address) => Ok((name, address)),
-            None => Err(format!("Not found address name in address_map",)),
+            None => Err("Not found address name in address_map".to_string()),
         },
-        None => Err(format!("Not found address in address_map",)),
+        None => Err("Not found address in address_map".to_string()),
     }
 }
 
@@ -38,21 +38,21 @@ fn main() -> std::io::Result<()> {
             init_function,
         } => {
             let dependency_dirs = match dependency_dirs {
-                Some(ref v) => v.split(",").collect(),
+                Some(ref v) => v.split(',').collect(),
                 None => vec![],
             };
 
             let address_maps = match address_maps {
                 Some(ref v) => v
-                    .split(",")
+                    .split(',')
                     .map(|x: &str| parse_address_map(x).unwrap())
                     .collect(),
                 None => vec![], // None => vec!<&str, &str>[],
             };
 
             let targets = match targets {
-                Some(ref v) => v.split(",").collect(),
-                None => vec!["starcoin"],
+                Some(ref v) => v.split(',').collect(),
+                None => vec!["aptos"],
             };
 
             let test_mode = test.unwrap_or(false);

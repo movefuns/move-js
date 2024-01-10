@@ -78,3 +78,64 @@ const startDisassembleTask = async (app: HTMLDivElement) => {
 const app = document.querySelector<HTMLDivElement>('#app')!
 startDisassembleTask(app)
 ```
+
+## Supported Rust Versions
+
+`@aptos/move-js` supports the version of Rust (toolchain and targets) specified
+in [`rust-toolchain.toml`](rust-toolchain.toml). At the time of writing, we are
+using version 1.77.0. However, this can change at any time if one of our
+dependencies changes MSRV or through a new patch version.
+
+## Building from source
+
+Note: You will need rust installed also for this. https://www.rust-lang.org/tools/install or
+
+```
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+
+Then get `@aptos/move-js` source:
+
+```
+git clone https://github.com/movefuns/move-js
+cd move-js
+git checkout aptos
+```
+
+Build the source
+
+```
+yarn install
+yarn build
+```
+
+## Testing
+
+### Build and test the example program
+
+[my-counter](/examples/my-counter/) (Compiling move package into blob)
+
+```
+cd example/my-counter/
+yarn install
+yarn dev
+```
+
+[disassemble](/examples/disassemble/) (Disassemble contract from bytecode)
+
+```
+cd example/disassemble
+yarn install
+yarn dev
+```
+
+### Unit test
+
+```
+yarn test
+```
+
+## License
+
+Licensed under the Apache License, Version 2.0,
+see the [LICENSE](LICENSE) file for more information.

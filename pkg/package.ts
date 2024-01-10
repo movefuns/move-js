@@ -116,8 +116,8 @@ export class MovePackage implements IMovePackage {
     await this.buildPackage(this.wasmfs, this.packagePath, deps, addresses)
   }
 
-  public getAllDeps(): string[] {
-    const deps = new Array<string>()
+  public getAllDeps(): Set<string> {
+    const deps = new Set<string>()
 
     this.collectDependencies(deps, this.dependencies)
     this.collectDependencies(deps, this.devDependencies)
@@ -125,7 +125,7 @@ export class MovePackage implements IMovePackage {
     return deps
   }
 
-  collectDependencies(allDeps: string[], modules: Map<string, IDependency>) {
+  collectDependencies(allDeps: Set<string>, modules: Map<string, IDependency>) {
     const packageAlias = this.packageAlias
 
     if (modules) {
@@ -133,7 +133,7 @@ export class MovePackage implements IMovePackage {
         const aliasPath = packageAlias.get(key)
 
         if (aliasPath != null) {
-          allDeps.push(aliasPath)
+          allDeps.add(aliasPath)
 
           new MovePackage(this.wasmfs, {
             packagePath: aliasPath,
@@ -141,7 +141,7 @@ export class MovePackage implements IMovePackage {
           })
             .getAllDeps()
             .forEach((depName: string) => {
-              allDeps.push(depName)
+              allDeps.add(depName)
             })
 
           return
@@ -149,7 +149,7 @@ export class MovePackage implements IMovePackage {
 
         if (dep.local) {
           const depPath = path.join(this.packagePath, dep.local)
-          allDeps.push(depPath)
+          allDeps.add(depPath)
 
           new MovePackage(this.wasmfs, {
             packagePath: depPath,
@@ -157,7 +157,7 @@ export class MovePackage implements IMovePackage {
           })
             .getAllDeps()
             .forEach((depName: string) => {
-              allDeps.push(depName)
+              allDeps.add(depName)
             })
         }
       })
@@ -223,7 +223,7 @@ export class MovePackage implements IMovePackage {
   async buildPackage(
     wasmfs: WasmFs,
     packagePath: string,
-    deps: string[],
+    deps: Set<string>,
     addresses: Map<string, string>
   ): Promise<void> {
     console.log('Building ', this.name)
@@ -233,7 +233,7 @@ export class MovePackage implements IMovePackage {
       preopens: ['/workspace'],
     })
 
-    const depDirs = deps.join(',')
+    const depDirs = Array.from(deps).join(',')
     const addressMaps = new Array<string>()
     addresses.forEach((val: string, key: string) => {
       addressMaps.push(key + ':' + val)

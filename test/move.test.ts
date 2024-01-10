@@ -11,35 +11,42 @@ describe("Move", () => {
     git = new Git(wasmfs);
   });
 
-  it("run build unit-test should be ok", async () => {
+  it("cli build unit-test should be ok", async () => {
+    await git.download("./base/test/data/framework.zip", "/workspace/framework");
     await git.download("./base/test/data/unit-test.zip", "/workspace/unit-test");
 
     let cli = new Move(wasmfs, {
-      pwd: "/workspace/unit-test"
+      pwd: "/workspace/unit-test",
+      preopens: ["/workspace"],
     })
 
-    await cli.run(["--", "build", "--address_maps", "Std:0x1", "--test", "true"])
+    await cli.run(["--", "build", "--dependency_dirs", "/workspace/framework/move-stdlib",
+      "--address_maps", "UnitTest:0xABCDE,std:0x1,core_resources:0xA550C18,vm_reserved:0x0,Extensions:0x1",
+      "--test", "true"]
+    )
 
-    const unitTestExists = wasmfs.fs.existsSync("/workspace/unit-test/target/starcoin/release/package.blob")
+    const unitTestExists = wasmfs.fs.existsSync("/workspace/unit-test/target/aptos/release/package.blob")
     expect(unitTestExists).toBeTruthy()
   });
 
-  it("run build starcoin-framework should be ok", async () => {
-    await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
+  it("cli build AptosFramework should be ok", async () => {
+    await git.download("./base/test/data/framework.zip", "/workspace/framework");
 
     let cli = new Move(wasmfs, {
-      pwd: "/workspace/starcoin-framework"
+      pwd: "/workspace/framework/aptos-framework",
+      preopens: ["/workspace"]
     })
 
-    await cli.run(["--", "build", "--dependency_dirs", "/workspace/starcoin-framework/unit-test", "--address_maps", "StarcoinFramework:0x1,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1"])
+    await cli.run(["--", "build", "--dependency_dirs", "/workspace/framework/aptos-framework,/workspace/framework/aptos-stdlib,/workspace/framework/move-stdlib",
+      "--address_maps", "std:0x1,aptos_std:0x1,aptos_framework:0x1,aptos_token:0x3,core_resources:0xA550C18,vm_reserved:0x0,Extensions:0x1"])
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/starcoin-framework/target/starcoin/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/framework/aptos-framework/target/aptos/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
 
 
-  it("run build my-counter example should be ok", async () => {
-    await git.download("./base/test/data/starcoin-framework.zip", "/workspace/starcoin-framework");
+  it("cli build my-counter example should be ok", async () => {
+    await git.download("./base/test/data/framework.zip", "/workspace/framework");
     await git.download("./base/test/data/my-counter.zip", "/workspace/my-counter");
 
     let cli = new Move(wasmfs, {
@@ -47,15 +54,15 @@ describe("Move", () => {
       preopens: ["/workspace"]
     })
 
-    await cli.run(["--", "build", "--dependency_dirs", "/workspace/starcoin-framework,/workspace/starcoin-framework/unit-test",
-      "--address_maps", "StarcoinFramework:0x1,MyCounter:0xABCDE,StarcoinAssociation:0xA550C18,VMReserved:0x0,Std:0x1",
+    await cli.run(["--", "build", "--dependency_dirs", "/workspace/framework/aptos-framework,/workspace/framework/aptos-stdlib,/workspace/framework/move-stdlib",
+      "--address_maps", "MyCounter:0xABCDE,std:0x1,aptos_std:0x1,aptos_framework:0x1,aptos_token:0x3,core_resources:0xA550C18,vm_reserved:0x0,Extensions:0x1",
       "--init_function", "0xABCDE::MyCounter::init"])
 
-    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/starcoin/release/package.blob")
+    const ntfExists = wasmfs.fs.existsSync("/workspace/my-counter/target/aptos/release/package.blob")
     expect(ntfExists).toBeTruthy()
   });
 
-  it("run disassemble should be ok", async () => {
+  it("cli disassemble should be ok", async () => {
 
     await git.download("./base/test/data/disassemble.zip", "/workspace/disassemble")
 
@@ -70,7 +77,7 @@ describe("Move", () => {
 
     if (ntfExists) {
       wasmfs.fs.readFile("/workspace/disassemble/test.d", (_, v) => {
-        console.log(v?.toString())
+        console.log("disassemble success")
       })
     } else {
       wasmfs.fs.readFile("/workspace/disassemble/test.e", (_, v) => {

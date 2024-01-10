@@ -1,2 +1,2 @@
-pub mod starcoin;
+pub mod aptos;
 pub mod target;

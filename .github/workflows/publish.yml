@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - aptos
-  pull_request:
-    branches:
-      - aptos
 
 jobs:
   release:

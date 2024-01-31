@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@aptos/move-js@../../":
+"@aptos-labs/move-js@../../":
   version "0.7.1"
   dependencies:
     "@iarna/toml" "^2.2.5"

@@ -1,7 +1,7 @@
 import './style.css'
 
 import { WasmFs } from '@wasmer/wasmfs'
-import { Disassemble } from '@aptos/move-js'
+import { Disassemble } from '@aptos-labs/move-js'
 
 const startDisassembleTask = async (app: HTMLDivElement) => {
   const wasmfs = new WasmFs()

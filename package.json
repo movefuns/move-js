@@ -1,5 +1,5 @@
 {
-  "name": "@aptos/move-js",
+  "name": "@movefuns/move-js",
   "version": "0.7.1",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
@@ -21,7 +21,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/aptos-labs/move-js"
+    "url": "https://github.com/movefuns/move-js"
+  },
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
   },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",

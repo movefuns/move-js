@@ -11,7 +11,7 @@ Javascript version of the move language compiler and disassemble
 * Compiling move package into blob example
 ```ts
 import { WasmFs } from '@wasmer/wasmfs'
-import { Git, MovePackage } from '@aptos-labs/move-js'
+import { Git, MovePackage } from '@movefuns/move-js'
 
 const startWasiTask = async (app: HTMLDivElement) => {
   const wasmfs = new WasmFs()
@@ -56,7 +56,7 @@ startWasiTask(app)
 * Disassemble contract example
 ```ts
 import { WasmFs } from '@wasmer/wasmfs'
-import { Disassemble } from '@aptos-labs/move-js'
+import { Disassemble } from '@movefuns/move-js'
 
 const startDisassembleTask = async (app: HTMLDivElement) => {
   const wasmfs = new WasmFs()
@@ -81,7 +81,7 @@ startDisassembleTask(app)
 
 ## Supported Rust Versions
 
-`@aptos-labs/move-js` supports the version of Rust (toolchain and targets) specified
+`@movefuns/move-js` supports the version of Rust (toolchain and targets) specified
 in [`rust-toolchain.toml`](rust-toolchain.toml). At the time of writing, we are
 using version 1.77.0. However, this can change at any time if one of our
 dependencies changes MSRV or through a new patch version.
@@ -94,7 +94,7 @@ Note: You will need rust installed also for this. https://www.rust-lang.org/tool
 curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 ```
 
-Then get `@aptos-labs/move-js` source:
+Then get `@movefuns/move-js` source:
 
 ```
 git clone https://github.com/movefuns/move-js

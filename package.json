@@ -1,6 +1,6 @@
 {
   "name": "@movefuns/move-js",
-  "version": "0.7.1",
+  "version": "0.7.2",
   "description": "Javascript version of the Move language compiler, supports compiling Move code into Move bytecode in the browser.",
   "keywords": [
     "move",
@@ -23,9 +23,6 @@
     "type": "git",
     "url": "https://github.com/movefuns/move-js"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "iife": "dist/index.iife.js",
@@ -44,7 +41,7 @@
     "clean": "rimraf dist && rimraf pkg/*.wasm",
     "release": "npm publish --access public --tag latest"
   },
-  "author": "aptos-labs",
+  "author": "movefuns",
   "license": "SEE LICENSE IN ./LICENSE",
   "peerDependencies": {
     "rollup": "2.x.x"

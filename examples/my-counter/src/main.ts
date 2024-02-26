@@ -1,7 +1,7 @@
 import './style.css'
 
 import { WasmFs } from '@wasmer/wasmfs'
-import { Git, MovePackage } from '@aptos-labs/move-js'
+import { Git, MovePackage } from '@movefuns/move-js'
 
 const startWasiTask = async (app: HTMLDivElement) => {
   const wasmfs = new WasmFs()

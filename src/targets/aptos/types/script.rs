@@ -1,7 +1,7 @@
 use crate::utils::serde_helper::vec_bytes;
 use move_core_types::identifier::{IdentStr, Identifier};
 use move_core_types::language_storage::{ModuleId, TypeTag};
-use schemars::{self, JsonSchema};
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 /// Call a Move script function.
